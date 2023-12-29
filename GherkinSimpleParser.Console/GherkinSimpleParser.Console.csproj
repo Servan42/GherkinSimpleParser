@@ -11,4 +11,10 @@
     <ProjectReference Include="..\GherkinSimpleParser\GherkinSimpleParser.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Blank_do_not_delete.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
