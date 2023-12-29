@@ -1,16 +1,28 @@
 ﻿using GherkinSimpleParser;
+using GherkinSimpleParser.Console;
 
-var directory = Console.ReadLine();
-Directory.CreateDirectory(@$"{directory}/GherkinToExcel");
-
-var gos = new List<GherkinObject>();
-foreach (var filepath in Directory.GetFiles(directory).Where(f => f.Contains(".feature")))
+try
 {
-    Console.WriteLine(filepath);
-    var lines = File.ReadAllLines(filepath).ToList();
-    gos.Add(GherkinObject.Parse(lines));
-    //File.WriteAllLines(@$"{directory}/GherkinToCsv/{Path.GetFileName(filepath)}.csv", goCSV);
-}
+	Console.WriteLine("Enter full path of input directory. Every .feature files inside of it will be parsed and exported");
+	var inputDirectoryPath = Console.ReadLine();
+	var outputDirPath = @$"{inputDirectoryPath}/GherkinToExcel";
+	Directory.CreateDirectory(outputDirPath);
 
-var excelConversionManager = new ExcelConversionManager();
-excelConversionManager.AppendTestsToExcelFile(@$"{directory}/GherkinToCsv/converted", gos);
+	var gherkinObjs = new List<GherkinObject>();
+	foreach (var filepath in Directory.GetFiles(inputDirectoryPath).Where(f => f.Contains(".feature")))
+	{
+		Console.WriteLine(filepath);
+		var lines = File.ReadAllLines(filepath).ToList();
+		var obj = GherkinObject.Parse(lines);
+		//File.WriteAllLines(@$"{outputDirPath}/{Path.GetFileName(filepath)}.csv", obj.ExportAsCSVWithExcelFormulaWrap_FR());
+		gherkinObjs.Add(obj);
+	}
+
+	new GherkinToExcel().AppendDataToExcelFile(outputDirPath, gherkinObjs);
+	Console.WriteLine($"Exported to {outputDirPath}");
+}
+catch (Exception ex)
+{
+    Console.WriteLine(ex);
+}
+Console.ReadKey();

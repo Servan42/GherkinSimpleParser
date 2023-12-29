@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ExcelConversionManager\ExcelConversionManager.csproj" />
     <ProjectReference Include="..\GherkinSimpleParser\GherkinSimpleParser.csproj" />
   </ItemGroup>
 
