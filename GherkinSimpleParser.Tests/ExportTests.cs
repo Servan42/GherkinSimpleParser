@@ -1,4 +1,5 @@
-﻿using NUnit.Framework.Internal;
+﻿using GherkinSimpleParser.Converter;
+using NUnit.Framework.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace GherkinSimpleParser.Tests
 {
     internal class ExportTests
     {
-        GherkinObject sut;
+        GherkinObject gherkinObject;
 
         /// <summary>
         /// Load a fully filled GherkinObject
@@ -17,7 +18,7 @@ namespace GherkinSimpleParser.Tests
         [SetUp]
         public void Setup()
         {
-            sut = new()
+            gherkinObject = new()
             {
                 FeatureName = "feature name",
                 Background = new Background
@@ -67,8 +68,11 @@ namespace GherkinSimpleParser.Tests
         [Test]
         public void Should_export_as_CSV()
         {
+            // Given
+            var converter = new CSVConverter();
+
             // When
-            var csvResult = sut.ExportAsCSV("|");
+            var csvResult = converter.ExportAsCSV("|", gherkinObject);
 
             // Then
             CollectionAssert.AreEqual(new List<string>()
@@ -86,8 +90,11 @@ namespace GherkinSimpleParser.Tests
         [Test]
         public void Should_export_as_CSV_excel_formula_wrap_french()
         {
+            // Given
+            var converter = new CSVConverter();
+
             // When
-            var csvResult = sut.ExportAsCSVWithExcelFormulaWrap_FR();
+            var csvResult = converter.ExportAsCSVWithExcelFormulaWrap_FR(gherkinObject);
             var test = string.Join("\r\n", csvResult);
 
             // Then
@@ -106,8 +113,11 @@ namespace GherkinSimpleParser.Tests
         [Test]
         public void Should_export_as_CSV_excel_formula_wrap_english()
         {
+            // Given
+            var converter = new CSVConverter();
+
             // When
-            var csvResult = sut.ExportAsCSVWithExcelFormulaWrap_EN();
+            var csvResult = converter.ExportAsCSVWithExcelFormulaWrap_EN(gherkinObject);
             var test = string.Join("\r\n", csvResult);
 
             // Then

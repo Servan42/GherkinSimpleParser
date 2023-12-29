@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GherkinSimpleParser.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GherkinSimpleParser.Console", "GherkinSimpleParser.Console\GherkinSimpleParser.Console.csproj", "{34DC311D-1197-42DF-BC7B-502D41BBD8D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelConversionManager", "ExcelConversionManager\ExcelConversionManager.csproj", "{725F6C41-26F8-4901-A7DC-79894E7E36DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GherkinSimpleParser.Converter", "GherkinSimpleParser.Converter\GherkinSimpleParser.Converter.csproj", "{FBEC16CE-8C48-400D-A1BF-512B17447E05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{34DC311D-1197-42DF-BC7B-502D41BBD8D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34DC311D-1197-42DF-BC7B-502D41BBD8D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34DC311D-1197-42DF-BC7B-502D41BBD8D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{725F6C41-26F8-4901-A7DC-79894E7E36DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{725F6C41-26F8-4901-A7DC-79894E7E36DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{725F6C41-26F8-4901-A7DC-79894E7E36DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{725F6C41-26F8-4901-A7DC-79894E7E36DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBEC16CE-8C48-400D-A1BF-512B17447E05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBEC16CE-8C48-400D-A1BF-512B17447E05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBEC16CE-8C48-400D-A1BF-512B17447E05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBEC16CE-8C48-400D-A1BF-512B17447E05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

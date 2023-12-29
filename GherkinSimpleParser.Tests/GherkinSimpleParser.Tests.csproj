@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GherkinSimpleParser.Converter\GherkinSimpleParser.Converter.csproj" />
     <ProjectReference Include="..\GherkinSimpleParser\GherkinSimpleParser.csproj" />
   </ItemGroup>
 

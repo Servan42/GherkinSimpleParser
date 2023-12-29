@@ -1,9 +1,9 @@
 ﻿using GherkinSimpleParser;
-using GherkinSimpleParser.Console;
+using GherkinSimpleParser.Converter;
 
 try
 {
-	Console.WriteLine("Enter full path of input directory. Every .feature files inside of it will be parsed and exported");
+    Console.WriteLine("Enter full path of input directory. Every .feature files inside of it will be parsed and exported");
 	var inputDirectoryPath = Console.ReadLine();
 	var outputDirPath = @$"{inputDirectoryPath}/GherkinToExcel";
 	Directory.CreateDirectory(outputDirPath);
@@ -18,11 +18,12 @@ try
 		gherkinObjs.Add(obj);
 	}
 
-	new GherkinToExcel().AppendDataToExcelFile(outputDirPath, gherkinObjs);
+	new ExcelConverter().AppendDataToExcelFile(Path.Combine(outputDirPath, "converted.xlsx"), gherkinObjs);
 	Console.WriteLine($"Exported to {outputDirPath}");
 }
 catch (Exception ex)
 {
     Console.WriteLine(ex);
 }
+Console.WriteLine("Press any key to close...");
 Console.ReadKey();

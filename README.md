@@ -38,9 +38,17 @@ var gherkinObj = GherkinObject.Parse(inputLines));
 * `|` (Data Tables)
 * `@` (Tags)
 
-# Export
+# Exports
 
-## Export as CSV for testplan with \<speparator> for ANDs
+## Export as Excel using EPPlus Excel library
+
+Using the applicaiton extension `GherkinSimpleParser.Converter` you have access to the class `ExcelConverter` that exports the GherkinObject to a predefined Excel TestPlan.
+
+## Export as CSV
+
+### Export as CSV for testplan with \<speparator> for ANDs
+
+Using the applicaiton extension `GherkinSimpleParser.Converter` you have access to the class `CSVConverter` that does the following:
 
 ```csharp
 GherkinObject gherkinObj = GherkinObject.Parse(inputLines));
@@ -83,7 +91,7 @@ into
 ";Prerequisite_2.1|Prere"q"uisite_2.2;Action_2;Result_2.1|Resu"l"t_2.2"
 ```
 
-## Export as CSV for testplan in Excel with formula WRAP
+### Export as CSV for testplan in Excel with formula wrap
 
 **LIMITATION: GIVENs and THENs text can only be 255 character longs because excel is annoying.**
 

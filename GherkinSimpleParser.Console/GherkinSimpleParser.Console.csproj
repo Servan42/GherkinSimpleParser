@@ -8,14 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ExcelConversionManager\ExcelConversionManager.csproj" />
+    <ProjectReference Include="..\GherkinSimpleParser.Converter\GherkinSimpleParser.Converter.csproj" />
     <ProjectReference Include="..\GherkinSimpleParser\GherkinSimpleParser.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Blank_do_not_delete.xlsx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

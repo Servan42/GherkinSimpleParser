@@ -10,7 +10,6 @@
     <Authors>Servan CHARLOT</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Servan42/GherkinSimpleParser</RepositoryUrl>
-    <PackageProjectUrl />
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
