@@ -81,20 +81,20 @@ namespace GherkinSimpleParser
         {
             var csv = new List<string>
             {
-                "Number,GIVEN,WHEN,THEN"
+                "Number;GIVEN;WHEN;THEN"
             };
 
             if (Background.Givens.Count > 0)
             {
                 string givenBackground = string.Join(separator, Background.Givens.Prepend("GENERAL PREREQUISITES:"));
-                csv.Add($",{givenBackground},,,");
+                csv.Add($";{givenBackground};;");
             }
 
             int testCount = 1;
             foreach (var scenario in Scenarios)
             {
-                csv.Add($"{testCount},{scenario.Name},,,");
-                csv.Add($",{string.Join(separator, scenario.Givens)},{scenario.When},{string.Join(separator, scenario.Thens)}");
+                csv.Add($"{testCount};{scenario.Name};;");
+                csv.Add($";{string.Join(separator, scenario.Givens)};{scenario.When};{string.Join(separator, scenario.Thens)}");
                 testCount++;
             }
 
@@ -115,20 +115,20 @@ namespace GherkinSimpleParser
         {
             var csv = new List<string>
             {
-                "Number,GIVEN,WHEN,THEN"
+                "Number;GIVEN;WHEN;THEN"
             };
 
             if (Background.Givens.Count > 0)
             {
-                string givenBackground = string.Join(separator, Background.Givens.Prepend("GENERAL PREREQUISITES:"));
-                csv.Add($",=\"{givenBackground}\",,,");
+                string givenBackground = string.Join(separator, Background.Givens.Prepend("GENERAL PREREQUISITES:").Select(g => g.Replace("\"","\"\"")));
+                csv.Add($";=\"{givenBackground}\";;");
             }
 
             int testCount = 1;
             foreach (var scenario in Scenarios)
             {
-                csv.Add($"{testCount},{scenario.Name},,,");
-                csv.Add($",=\"{string.Join(separator, scenario.Givens)}\",{scenario.When},=\"{string.Join(separator, scenario.Thens)}\"");
+                csv.Add($"{testCount};{scenario.Name};;");
+                csv.Add($";=\"{string.Join(separator, scenario.Givens.Select(g => g.Replace("\"", "\"\"")))}\";{scenario.When};=\"{string.Join(separator, scenario.Thens.Select(g => g.Replace("\"", "\"\"")))}\"");
                 testCount++;
             }
 
