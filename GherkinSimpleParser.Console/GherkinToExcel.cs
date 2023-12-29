@@ -55,9 +55,9 @@ namespace GherkinSimpleParser.Console
             foreach (var scenario in featureAndScenarios.Scenarios)
             {
                 InsertTextInCell(workSheetPart, scenario.Name, "B", lineToFillId);
+                InsertTextInCell(workSheetPart, testId.ToString(), "A", lineToFillId);
                 lineToFillId++;
 
-                InsertTextInCell(workSheetPart, testId.ToString(), "A", lineToFillId);
                 string givens = string.Join('\n', scenario.Givens.Select(x => "- " + x));
                 InsertTextInCell(workSheetPart, givens, "B", lineToFillId);
                 InsertTextInCell(workSheetPart, scenario.When, "C", lineToFillId);
