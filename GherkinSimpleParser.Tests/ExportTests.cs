@@ -25,7 +25,7 @@ namespace GherkinSimpleParser.Tests
                     Givens = new List<string>
                     {
                         "Prerequisite_0.1",
-                        "Prerequisite_0.2"
+                        "Prere\"q\"uisite_0.2"
                     }
                 },
                 Scenarios = new List<Scenario>
@@ -36,13 +36,13 @@ namespace GherkinSimpleParser.Tests
                         Givens = new List<string>
                         {
                             "Prerequisite_1.1",
-                            "Prerequisite_1.2"
+                            "Prere\"q\"uisite_1.2"
                         },
                         When = "Action_1",
                         Thens = new List<string>
                         {
                             "Result_1.1",
-                            "Result_1.2"
+                            "Resu\"l\"t_1.2"
                         },
                     },
                     new Scenario
@@ -51,13 +51,13 @@ namespace GherkinSimpleParser.Tests
                         Givens = new List<string>
                         {
                             "Prerequisite_2.1",
-                            "Prerequisite_2.2"
+                            "Prere\"q\"uisite_2.2"
                         },
                         When = "Action_2",
                         Thens = new List<string>
                         {
                             "Result_2.1",
-                            "Result_2.2"
+                            "Resu\"l\"t_2.2"
                         }
                     }
                 }
@@ -74,11 +74,11 @@ namespace GherkinSimpleParser.Tests
             CollectionAssert.AreEqual(new List<string>()
             {
                 "Number,GIVEN,WHEN,THEN",
-                ",GENERAL PREREQUISITES:|Prerequisite_0.1|Prerequisite_0.2,,,",
+                ",GENERAL PREREQUISITES:|Prerequisite_0.1|Prere\"q\"uisite_0.2,,,",
                 "1,Test Case 1,,,",
-                ",Prerequisite_1.1|Prerequisite_1.2,Action_1,Result_1.1|Result_1.2",
+                ",Prerequisite_1.1|Prere\"q\"uisite_1.2,Action_1,Result_1.1|Resu\"l\"t_1.2",
                 "2,Test Case 2,,,",
-                ",Prerequisite_2.1|Prerequisite_2.2,Action_2,Result_2.1|Result_2.2"
+                ",Prerequisite_2.1|Prere\"q\"uisite_2.2,Action_2,Result_2.1|Resu\"l\"t_2.2"
             },
             csvResult);
         }
@@ -94,11 +94,11 @@ namespace GherkinSimpleParser.Tests
             CollectionAssert.AreEqual(new List<string>()
             {
                 "Number,GIVEN,WHEN,THEN",
-                ",=\"GENERAL PREREQUISITES:\" & CAR(10) & \"Prerequisite_0.1\" & CAR(10) & \"Prerequisite_0.2\",,,",
+                ",=\"GENERAL PREREQUISITES:\" & CAR(10) & \"Prerequisite_0.1\" & CAR(10) & \"Prere\"\"q\"\"uisite_0.2\",,,",
                 "1,Test Case 1,,,",
-                ",=\"Prerequisite_1.1\" & CAR(10) & \"Prerequisite_1.2\",Action_1,=\"Result_1.1\" & CAR(10) & \"Result_1.2\"",
+                ",=\"Prerequisite_1.1\" & CAR(10) & \"Prere\"\"q\"\"uisite_1.2\",Action_1,=\"Result_1.1\" & CAR(10) & \"Resu\"\"l\"\"t_1.2\"",
                 "2,Test Case 2,,,",
-                ",=\"Prerequisite_2.1\" & CAR(10) & \"Prerequisite_2.2\",Action_2,=\"Result_2.1\" & CAR(10) & \"Result_2.2\""
+                ",=\"Prerequisite_2.1\" & CAR(10) & \"Prere\"\"q\"\"uisite_2.2\",Action_2,=\"Result_2.1\" & CAR(10) & \"Resu\"\"l\"\"t_2.2\""
             },
             csvResult);
         }
@@ -114,11 +114,11 @@ namespace GherkinSimpleParser.Tests
             CollectionAssert.AreEqual(new List<string>()
             {
                 "Number,GIVEN,WHEN,THEN",
-                ",=\"GENERAL PREREQUISITES:\" & CHAR(10) & \"Prerequisite_0.1\" & CHAR(10) & \"Prerequisite_0.2\",,,",
+                ",=\"GENERAL PREREQUISITES:\" & CHAR(10) & \"Prerequisite_0.1\" & CHAR(10) & \"Prere\"\"q\"\"uisite_0.2\",,,",
                 "1,Test Case 1,,,",
-                ",=\"Prerequisite_1.1\" & CHAR(10) & \"Prerequisite_1.2\",Action_1,=\"Result_1.1\" & CHAR(10) & \"Result_1.2\"",
+                ",=\"Prerequisite_1.1\" & CHAR(10) & \"Prere\"\"q\"\"uisite_1.2\",Action_1,=\"Result_1.1\" & CHAR(10) & \"Resu\"\"l\"\"t_1.2\"",
                 "2,Test Case 2,,,",
-                ",=\"Prerequisite_2.1\" & CHAR(10) & \"Prerequisite_2.2\",Action_2,=\"Result_2.1\" & CHAR(10) & \"Result_2.2\""
+                ",=\"Prerequisite_2.1\" & CHAR(10) & \"Prere\"\"q\"\"uisite_2.2\",Action_2,=\"Result_2.1\" & CHAR(10) & \"Resu\"\"l\"\"t_2.2\""
             },
             csvResult);
         }

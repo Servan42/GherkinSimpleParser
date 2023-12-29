@@ -120,7 +120,7 @@ namespace GherkinSimpleParser
 
             if (Background.Givens.Count > 0)
             {
-                string givenBackground = string.Join(separator, Background.Givens.Prepend("GENERAL PREREQUISITES:"));
+                string givenBackground = string.Join(separator, Background.Givens.Prepend("GENERAL PREREQUISITES:").Select(g => g.Replace("\"","\"\"")));
                 csv.Add($",=\"{givenBackground}\",,,");
             }
 
@@ -128,7 +128,7 @@ namespace GherkinSimpleParser
             foreach (var scenario in Scenarios)
             {
                 csv.Add($"{testCount},{scenario.Name},,,");
-                csv.Add($",=\"{string.Join(separator, scenario.Givens)}\",{scenario.When},=\"{string.Join(separator, scenario.Thens)}\"");
+                csv.Add($",=\"{string.Join(separator, scenario.Givens.Select(g => g.Replace("\"", "\"\"")))}\",{scenario.When},=\"{string.Join(separator, scenario.Thens.Select(g => g.Replace("\"", "\"\"")))}\"");
                 testCount++;
             }
 
