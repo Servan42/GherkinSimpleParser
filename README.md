@@ -85,6 +85,8 @@ into
 
 ## Export as CSV for testplan in Excel with formula WRAP
 
+**LIMITATION: GIVENs and THENs text can only be 255 character longs because excel is annoying.**
+
 ```csharp
 GherkinObject gherkinObj = GherkinObject.Parse(inputLines));
 string separator = "|";
