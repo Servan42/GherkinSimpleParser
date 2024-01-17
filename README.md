@@ -20,6 +20,7 @@ var gherkinObj = GherkinObject.Parse(inputLines));
 * `When` (unique)
 * `Then`
 * `And` (then, multiple)
+* `"""` (Doc Strings) (for Given, Then)
 
 ## Ignores
 * Empty lines
@@ -34,7 +35,6 @@ var gherkinObj = GherkinObject.Parse(inputLines));
 * `*`
 * `Scenario Outline` (or `Scenario Template`)
 * `Examples` (or `Scenarios`)
-* `"""` (Doc Strings)
 * `|` (Data Tables)
 * `@` (Tags)
 
@@ -45,6 +45,10 @@ var gherkinObj = GherkinObject.Parse(inputLines));
 Using the applicaiton extension `GherkinSimpleParser.Converter` you have access to the class `ExcelConverter` that exports the GherkinObject to a predefined Excel TestPlan.
 
 ## Export as CSV
+
+### To be noted
+
+New lines and carriage return are removed from Doc strings (`"""`).
 
 ### Export as CSV for testplan with \<speparator> for ANDs
 

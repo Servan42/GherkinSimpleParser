@@ -2,6 +2,6 @@
 {
     public class Background
     {
-        public List<string> Givens { get; set; } = new();
+        public List<Instruction> Givens { get; set; } = new();
     }
 }

@@ -79,7 +79,7 @@ namespace GherkinSimpleParser.Converter
                 foreach (var prerequisite in featureAndScenarios.Background.Givens)
                 {
                     generalPrerequisite.Append("- ");
-                    generalPrerequisite.AppendLine(prerequisite);
+                    generalPrerequisite.AppendLine(prerequisite.MainLine);
                 }
 
                 ws.Cells[$"B{lineToFillId}"].Value = generalPrerequisite.ToString();
@@ -99,10 +99,10 @@ namespace GherkinSimpleParser.Converter
                 SetColor(ws, $"A{lineToFillId}:F{lineToFillId}", Color.FromArgb(255, 180, 198, 231));
                 lineToFillId++;
 
-                string givens = string.Join('\n', scenario.Givens.Select(x => "- " + x));
+                string givens = string.Join('\n', scenario.Givens.Select(x => "- " + x.MainLine));
                 ws.Cells[$"B{lineToFillId}"].Value = givens;
                 ws.Cells[$"C{lineToFillId}"].Value = scenario.When;
-                string thens = string.Join('\n', scenario.Thens.Select(x => "- " + x));
+                string thens = string.Join('\n', scenario.Thens.Select(x => "- " + x.MainLine));
                 ws.Cells[$"D{lineToFillId}"].Value = thens;
                 ws.Cells[$"A{lineToFillId}:F{lineToFillId}"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 

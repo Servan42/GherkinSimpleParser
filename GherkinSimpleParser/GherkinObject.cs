@@ -46,9 +46,9 @@ namespace GherkinSimpleParser
                 else if (line.StartsWith("Given "))
                 {
                     if (andFillingState == "SCENARIO_GIVEN")
-                        currentScenario.Givens.Add(line.Substring(6));
+                        currentScenario.Givens.Add(new Instruction(line.Substring(6)));
                     else
-                        result.Background.Givens.Add(line.Substring(6));
+                        result.Background.Givens.Add(new Instruction(line.Substring(6)));
                 }
                 else if (line.StartsWith("When "))
                 {
@@ -56,17 +56,17 @@ namespace GherkinSimpleParser
                 }
                 else if (line.StartsWith("Then "))
                 {
-                    currentScenario.Thens.Add(line.Substring(5));
+                    currentScenario.Thens.Add(new Instruction(line.Substring(5)));
                     andFillingState = "SCENARIO_THEN";
                 }
                 else if (line.StartsWith("And "))
                 {
                     if (andFillingState == "SCENARIO_GIVEN")
-                        currentScenario.Givens.Add(line.Substring(4));
+                        currentScenario.Givens.Add(new Instruction(line.Substring(4)));
                     else if (andFillingState == "SCENARIO_THEN")
-                        currentScenario.Thens.Add(line.Substring(4));
+                        currentScenario.Thens.Add(new Instruction(line.Substring(4)));
                     else
-                        result.Background.Givens.Add(line.Substring(4));
+                        result.Background.Givens.Add(new Instruction(line.Substring(4)));
                 }
                 else
                 {
