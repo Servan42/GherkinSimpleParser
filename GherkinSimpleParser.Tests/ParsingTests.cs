@@ -241,6 +241,42 @@ namespace GherkinSimpleParser.Tests
             });
         }
 
+        [Test]
+        public void Should_parse_doc_strings_and_indent()
+        {
+            // Given
+            var inputLines = new List<string>
+            {
+                "   Scenario: Should do something",
+                "       Given prerequisite2",
+                "\"\"\"",
+                "docstring_sc_given_1",
+                "   docstring_sc_given_2",
+                "\"\"\"",
+                "       And prerequisite3",
+                "       \"\"\"",
+                "       docstring_sc_given_and_1",
+                "           docstring_sc_given_and_2",
+                "       \"\"\"",
+                "       When action",
+                "       Then result",
+            };
+
+            // When
+            var result = GherkinObject.Parse(inputLines);
+
+            // Then
+            Assert.Multiple(() =>
+            {
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_given_1", "    docstring_sc_given_2" },
+                    result.Scenarios.First().Givens.First().DocStrings);
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_given_and_1", "    docstring_sc_given_and_2" },
+                    result.Scenarios.First().Givens.Last().DocStrings);
+            });
+        }
+
         [TestCase("Example:")]
         [TestCase("But")]
         [TestCase("*")]
