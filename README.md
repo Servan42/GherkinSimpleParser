@@ -97,7 +97,7 @@ into
 
 ### Export as CSV for testplan in Excel with formula wrap
 
-**LIMITATION: GIVENs and THENs text can only be 255 character longs because excel is annoying.**
+**LIMITATION: GIVENs and THENs text can only be 255 character longs because excel is annoying. Hence, DocStrings are not exported in this mode**
 
 ```csharp
 GherkinObject gherkinObj = GherkinObject.Parse(inputLines));
