@@ -284,6 +284,95 @@ namespace GherkinSimpleParser.Tests
             });
         }
 
+        [Test]
+        public void Should_parse_tag_before_feature()
+        {
+            // Given
+            var inputLines = new List<string>
+            {
+                "@featuretag",
+                "Feature: myFeature"
+            };
+
+            // When
+            var result = GherkinObject.Parse(inputLines);
+
+            // Then
+            Assert.That(result.FeatureTag, Is.EqualTo("@featuretag"));
+        }
+
+        [Test]
+        public void Should_parse_tag_before_scenarios()
+        {
+            // Given
+            var inputLines = new List<string>
+            {
+                "@featuretag",
+                "Feature: myFeature",
+                "",
+                "   @scenarioTag 1",
+                "   Scenario: Scenario 1",
+                "       Given a",
+                "       When b",
+                "       Then c",
+                "",
+                "   @scenarioTag2",
+                "   Scenario: Scenario 2",
+                "       Given a",
+                "       When b",
+                "       Then c",
+            };
+
+            // When
+            var result = GherkinObject.Parse(inputLines);
+
+            // Then
+            Assert.That(result.Scenarios.First().Tag, Is.EqualTo("@scenarioTag 1"));
+            Assert.That(result.Scenarios.Last().Tag, Is.EqualTo("@scenarioTag2"));
+        }
+
+        [Test]
+        public void Should_get_scenario_tag_dictionnary()
+        {
+            // Given
+            var inputLines = new List<string>
+            {
+                "@featuretag",
+                "Feature: myFeature",
+                "",
+                "   @scenarioTag 1",
+                "   Scenario: Scenario 1",
+                "       Given a",
+                "       When b",
+                "       Then c",
+                "",
+                "   @scenarioTag2",
+                "   Scenario: Scenario 2",
+                "       Given a",
+                "       When b",
+                "       Then c",
+                "",
+                "   @scenarioTag 1",
+                "   Scenario: Scenario 3",
+                "       Given a",
+                "       When b",
+                "       Then c",
+            };
+
+            var gherkinObject = GherkinObject.Parse(inputLines);
+
+            // When
+            var dict = gherkinObject.GetScenariosByTag();
+
+            // Then
+            Assert.That(dict.Count, Is.EqualTo(2));
+            Assert.That(dict["@scenarioTag 1"].Count, Is.EqualTo(2));
+            Assert.That(dict["@scenarioTag 1"].First().Name, Is.EqualTo("Scenario 1"));
+            Assert.That(dict["@scenarioTag 1"].Last().Name, Is.EqualTo("Scenario 3"));
+            Assert.That(dict["@scenarioTag2"].Count, Is.EqualTo(1));
+            Assert.That(dict["@scenarioTag2"].Last().Name, Is.EqualTo("Scenario 2"));
+        }
+
         [TestCase("Example:")]
         [TestCase("But")]
         [TestCase("*")]

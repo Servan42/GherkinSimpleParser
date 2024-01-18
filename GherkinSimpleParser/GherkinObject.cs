@@ -7,6 +7,7 @@ namespace GherkinSimpleParser
         public string FeatureName { get; set; }
         public Background Background { get; set; } = new();
         public List<Scenario> Scenarios { get; set; } = new();
+        public string FeatureTag { get; set; }
 
         private enum FillingState
         {
@@ -128,6 +129,11 @@ namespace GherkinSimpleParser
             }
 
             return result;
+        }
+
+        public Dictionary<string, List<Scenario>> GetScenariosByTag()
+        {
+            throw new NotImplementedException();
         }
     }
 }
