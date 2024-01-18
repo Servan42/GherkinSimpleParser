@@ -26,10 +26,10 @@ var gherkinObj = GherkinObject.Parse(inputLines));
 * Empty lines
 * `#` (Comments)
 
-## DO NOT support
-* Guard clause for wrongly structured files
-* Unexpected lines (will throw exception)
+## DO NOT support (will throw exception)
+* Guard clause for wrongly structured files and unexpected lines
 * Multiple `Feature` per file
+* `Rule`
 * `Example`
 * `But`
 * `*`
