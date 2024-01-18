@@ -8,7 +8,7 @@ Library that loads [Gherkin syntax](https://cucumber.io/docs/gherkin/reference/)
 
 ```csharp
 var inputLines = new List<string>();
-var gherkinObj = GherkinObject.Parse(inputLines));
+var gherkinObj = new GherkinObjectParser(lines).Parse();
 ```
 
 ## Supports
@@ -65,7 +65,7 @@ List<string> CSVLines = gherkinObj.ExportAsCSV(separator));
 ```
 
 Transforms
-```
+```gherkin
 Feature: feature name
 # As user
 # I want to do test cases
