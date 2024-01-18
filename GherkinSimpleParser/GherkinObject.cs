@@ -7,7 +7,7 @@ namespace GherkinSimpleParser
         public string FeatureName { get; set; }
         public Background Background { get; set; } = new();
         public List<Scenario> Scenarios { get; set; } = new();
-        public string FeatureTag { get; set; }
+        public List<string> FeatureTags { get; set; }
 
         private enum FillingState
         {
@@ -31,7 +31,7 @@ namespace GherkinSimpleParser
             FillingState fillingState = FillingState.OTHER;
             int featureCount = 0;
             int backgroundCount = 0;
-            string lastSeenTag = string.Empty;
+            List<string> lastSeenTags = new();
 
             Queue<string> linesStack = new Queue<string>(inputLines);
 
@@ -51,17 +51,18 @@ namespace GherkinSimpleParser
                 }
                 else if(trimedLine.StartsWith("@"))
                 {
-                    if(!string.IsNullOrEmpty(lastSeenTag))
-                        throw new ArgumentException($"Line {lineCount}: Encoutered new tag {trimedLine} but last tag {lastSeenTag} was not assigned to a feature of scenario.", nameof(inputLines));
-                    lastSeenTag = trimedLine;
+                    if (trimedLine.Split(' ').Any(sub => !sub.StartsWith("@")))
+                        throw new ArgumentException($"Line {lineCount}: In a tag line, spaces can only be used to separate tags starting with @.", nameof(inputLines));
+                    var tagsOnLine = trimedLine.Replace(" ", "").Split('@', StringSplitOptions.RemoveEmptyEntries).Select(tag => "@" + tag);
+                    lastSeenTags.AddRange(tagsOnLine);
                 }
                 else if (trimedLine.StartsWith("Feature: "))
                 {
                     if (featureCount > 0)
                         throw new ArgumentException($"Line {lineCount}: Do not support multiple features in one file", nameof(inputLines));
                     result.FeatureName = trimedLine.Substring(9);
-                    result.FeatureTag = lastSeenTag;
-                    lastSeenTag = string.Empty;
+                    result.FeatureTags = new List<string>(lastSeenTags.Distinct());
+                    lastSeenTags.Clear();
                     featureCount++;
                     fillingState = FillingState.OTHER;
                 }
@@ -75,8 +76,8 @@ namespace GherkinSimpleParser
                 else if (trimedLine.StartsWith("Scenario: "))
                 {
                     currentScenario = new Scenario { Name = trimedLine.Substring(10) };
-                    currentScenario.Tag = lastSeenTag;
-                    lastSeenTag = string.Empty;
+                    currentScenario.Tags = new List<string>(lastSeenTags.Distinct());
+                    lastSeenTags.Clear();
                     result.Scenarios.Add(currentScenario);
                     fillingState = FillingState.SCENARIO_GIVEN;
                 }
@@ -148,10 +149,13 @@ namespace GherkinSimpleParser
 
             foreach (var scenario in this.Scenarios)
             {
-                if (result.ContainsKey(scenario.Tag))
-                    result[scenario.Tag].Add(scenario);
-                else
-                    result.Add(scenario.Tag, new List<Scenario> { scenario });
+                foreach (var tag in scenario.Tags)
+                {
+                    if (result.ContainsKey(tag))
+                        result[tag].Add(scenario);
+                    else
+                        result.Add(tag, new List<Scenario> { scenario });
+                }
             }
 
             return result;

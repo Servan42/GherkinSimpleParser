@@ -6,6 +6,6 @@
         public List<Instruction> Givens { get; set; } = new();
         public string When { get; set; }
         public List<Instruction> Thens { get; set; } = new();
-        public string Tag { get; set; }
+        public List<string> Tags { get; set; }
     }
 }
