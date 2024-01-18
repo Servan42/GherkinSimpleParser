@@ -51,16 +51,19 @@ namespace GherkinSimpleParser.Converter
             return string.Join(separator, flattened);
         }
 
+        [Obsolete("Deprecated: Will be removed in future versions. Use/modify the ExcelConverter to your needs instead.")]
         public List<string> ExportAsCSVWithExcelFormulaWrap_FR(GherkinObject gherkinObj)
         {
             return ExportAsCSVWithExcelFormulaWrap("\" & CAR(10) & \"", gherkinObj);
         }
 
+        [Obsolete("Deprecated: Will be removed in future versions. Use/modify the ExcelConverter to your needs instead.")]
         public List<string> ExportAsCSVWithExcelFormulaWrap_EN(GherkinObject gherkinObj)
         {
             return ExportAsCSVWithExcelFormulaWrap("\" & CHAR(10) & \"", gherkinObj);
         }
 
+        [Obsolete("Deprecated: Will be removed in future versions. Use/modify the ExcelConverter to your needs instead.")]
         private List<string> ExportAsCSVWithExcelFormulaWrap(string separator, GherkinObject gherkinObj)
         {
             var csv = new List<string>
