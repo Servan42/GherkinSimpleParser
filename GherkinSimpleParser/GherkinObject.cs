@@ -31,6 +31,7 @@ namespace GherkinSimpleParser
             FillingState fillingState = FillingState.OTHER;
             int featureCount = 0;
             int backgroundCount = 0;
+            string lastSeenTag = string.Empty;
 
             Queue<string> linesStack = new Queue<string>(inputLines);
 
@@ -48,11 +49,19 @@ namespace GherkinSimpleParser
                 {
                     continue;
                 }
+                else if(trimedLine.StartsWith("@"))
+                {
+                    if(!string.IsNullOrEmpty(lastSeenTag))
+                        throw new ArgumentException($"Line {lineCount}: Encoutered new tag {trimedLine} but last tag {lastSeenTag} was not assigned to a feature of scenario.", nameof(inputLines));
+                    lastSeenTag = trimedLine;
+                }
                 else if (trimedLine.StartsWith("Feature: "))
                 {
                     if (featureCount > 0)
                         throw new ArgumentException($"Line {lineCount}: Do not support multiple features in one file", nameof(inputLines));
                     result.FeatureName = trimedLine.Substring(9);
+                    result.FeatureTag = lastSeenTag;
+                    lastSeenTag = string.Empty;
                     featureCount++;
                     fillingState = FillingState.OTHER;
                 }
@@ -66,6 +75,8 @@ namespace GherkinSimpleParser
                 else if (trimedLine.StartsWith("Scenario: "))
                 {
                     currentScenario = new Scenario { Name = trimedLine.Substring(10) };
+                    currentScenario.Tag = lastSeenTag;
+                    lastSeenTag = string.Empty;
                     result.Scenarios.Add(currentScenario);
                     fillingState = FillingState.SCENARIO_GIVEN;
                 }
@@ -133,7 +144,17 @@ namespace GherkinSimpleParser
 
         public Dictionary<string, List<Scenario>> GetScenariosByTag()
         {
-            throw new NotImplementedException();
+            var result = new Dictionary<string, List<Scenario>>();
+
+            foreach (var scenario in this.Scenarios)
+            {
+                if (result.ContainsKey(scenario.Tag))
+                    result[scenario.Tag].Add(scenario);
+                else
+                    result.Add(scenario.Tag, new List<Scenario> { scenario });
+            }
+
+            return result;
         }
     }
 }
