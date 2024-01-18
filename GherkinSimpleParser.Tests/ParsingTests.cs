@@ -50,8 +50,8 @@ namespace GherkinSimpleParser.Tests
             var result = GherkinObject.Parse(inputLines);
 
             // Then
-            Assert.That(result.Scenarios.First().Givens.First(), Is.EqualTo("prerequisite"));
-            Assert.That(result.Scenarios.Last().Givens.First(), Is.EqualTo("prerequisite2"));
+            Assert.That(result.Scenarios.First().Givens.First().MainLine, Is.EqualTo("prerequisite"));
+            Assert.That(result.Scenarios.Last().Givens.First().MainLine, Is.EqualTo("prerequisite2"));
         }
 
         [Test]
@@ -72,8 +72,8 @@ namespace GherkinSimpleParser.Tests
             var result = GherkinObject.Parse(inputLines);
 
             // Then
-            Assert.That(result.Scenarios.First().Givens.Last(), Is.EqualTo("prerequisite1"));
-            Assert.That(result.Scenarios.Last().Givens.Last(), Is.EqualTo("prerequisite3"));
+            Assert.That(result.Scenarios.First().Givens.Last().MainLine, Is.EqualTo("prerequisite1"));
+            Assert.That(result.Scenarios.Last().Givens.Last().MainLine, Is.EqualTo("prerequisite3"));
         }
 
         [Test]
@@ -112,8 +112,8 @@ namespace GherkinSimpleParser.Tests
             var result = GherkinObject.Parse(inputLines);
 
             // Then
-            Assert.That(result.Scenarios.First().Thens.First(), Is.EqualTo("result"));
-            Assert.That(result.Scenarios.Last().Thens.First(), Is.EqualTo("result2"));
+            Assert.That(result.Scenarios.First().Thens.First().MainLine, Is.EqualTo("result"));
+            Assert.That(result.Scenarios.Last().Thens.First().MainLine, Is.EqualTo("result2"));
         }
 
         [Test]
@@ -135,8 +135,8 @@ namespace GherkinSimpleParser.Tests
             var result = GherkinObject.Parse(inputLines);
 
             // Then
-            Assert.That(result.Scenarios.First().Thens.Last(), Is.EqualTo("result1"));
-            Assert.That(result.Scenarios.Last().Thens.Last(), Is.EqualTo("result3"));
+            Assert.That(result.Scenarios.First().Thens.Last().MainLine, Is.EqualTo("result1"));
+            Assert.That(result.Scenarios.Last().Thens.Last().MainLine, Is.EqualTo("result3"));
         }
 
         [Test]
@@ -162,12 +162,125 @@ namespace GherkinSimpleParser.Tests
             // Then
             Assert.Multiple(() =>
             {
-                Assert.That(result.Background.Givens.First(), Is.EqualTo("prerequisite"));
-                Assert.That(result.Background.Givens.Last(), Is.EqualTo("prerequisite1"));
-                Assert.That(result.Scenarios.First().Givens.First(), Is.EqualTo("prerequisite2"));
-                Assert.That(result.Scenarios.First().Givens.Last(), Is.EqualTo("prerequisite3"));
-                Assert.That(result.Scenarios.First().Thens.First(), Is.EqualTo("result"));
-                Assert.That(result.Scenarios.Last().Thens.Last(), Is.EqualTo("result1"));
+                Assert.That(result.Background.Givens.First().MainLine, Is.EqualTo("prerequisite"));
+                Assert.That(result.Background.Givens.Last().MainLine, Is.EqualTo("prerequisite1"));
+                Assert.That(result.Scenarios.First().Givens.First().MainLine, Is.EqualTo("prerequisite2"));
+                Assert.That(result.Scenarios.First().Givens.Last().MainLine, Is.EqualTo("prerequisite3"));
+                Assert.That(result.Scenarios.First().Thens.First().MainLine, Is.EqualTo("result"));
+                Assert.That(result.Scenarios.Last().Thens.Last().MainLine, Is.EqualTo("result1"));
+            });
+        }
+
+        [Test]
+        public void Should_parse_doc_strings()
+        {
+            // Given
+            var inputLines = new List<string>
+            {
+                "   Background:",
+                "       Given prerequisite",
+                "       \"\"\"",
+                "       docstring_bg_given_1",
+                "       docstring_bg_given_2",
+                "       \"\"\"",
+                "       And prerequisite1",
+                "       \"\"\"",
+                "       docstring_bg_given_and_1",
+                "       docstring_bg_given_and_2",
+                "       \"\"\"",
+                "   Scenario: Should do something",
+                "       Given prerequisite2",
+                "       \"\"\"",
+                "       docstring_sc_given_1",
+                "       docstring_sc_given_2",
+                "       \"\"\"",
+                "       And prerequisite3",
+                "       \"\"\"",
+                "       docstring_sc_given_and_1",
+                "       docstring_sc_given_and_2",
+                "       \"\"\"",
+                "       When action",
+                "       Then result",
+                "       \"\"\"",
+                "       docstring_sc_then_1",
+                "       docstring_sc_then_2",
+                "       \"\"\"",
+                "       And result1",
+                "       \"\"\"",
+                "       docstring_sc_then_and_1",
+                "       docstring_sc_then_and_2",
+                "       \"\"\"",
+            };
+
+            // When
+            var result = GherkinObject.Parse(inputLines);
+
+            // Then
+            Assert.Multiple(() =>
+            {
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_bg_given_1", "docstring_bg_given_2" },
+                    result.Background.Givens.First().DocStrings);
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_bg_given_and_1", "docstring_bg_given_and_2" },
+                    result.Background.Givens.Last().DocStrings);
+                
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_given_1", "docstring_sc_given_2" },
+                    result.Scenarios.First().Givens.First().DocStrings);
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_given_and_1", "docstring_sc_given_and_2" },
+                    result.Scenarios.First().Givens.Last().DocStrings);
+                
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_then_1", "docstring_sc_then_2" },
+                    result.Scenarios.First().Thens.First().DocStrings);
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_then_and_1", "docstring_sc_then_and_2" },
+                    result.Scenarios.First().Thens.Last().DocStrings);
+            });
+        }
+
+        [Test]
+        public void Should_parse_doc_strings_and_indent()
+        {
+            // Given
+            var inputLines = new List<string>
+            {
+                "    Scenario: Should do something",
+                "        Given prerequisite2",
+                "\"\"\"",
+                "docstring_sc_given_1",
+                "    docstring_sc_given_2",
+                "\"\"\"",
+                "        And prerequisite3",
+                "        \"\"\"",
+                "        docstring_sc_given_and_1",
+                "            docstring_sc_given_and_2",
+                "        \"\"\"",
+                "        When action",
+                "        Then result",
+                "        \"\"\"",
+                "        docstring_sc_then_1",
+                "docstring_sc_then_2",
+                "        \"\"\"",
+            };
+
+            // When
+            var result = GherkinObject.Parse(inputLines);
+
+            // Then
+            Assert.Multiple(() =>
+            {
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_given_1", "    docstring_sc_given_2" },
+                    result.Scenarios.First().Givens.First().DocStrings);
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_given_and_1", "    docstring_sc_given_and_2" },
+                    result.Scenarios.First().Givens.Last().DocStrings);
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_then_1", "docstring_sc_then_2" },
+                    result.Scenarios.First().Thens.Last().DocStrings);
             });
         }
 
@@ -178,7 +291,6 @@ namespace GherkinSimpleParser.Tests
         [TestCase("Scenario Template:")]
         [TestCase("Examples:")]
         [TestCase("Scenarios:")]
-        [TestCase("\"\"\"")]
         [TestCase("|")]
         [TestCase("@")]
         public void Should_throw_exception_when_encounters_an_unsupported_line(string startWith)

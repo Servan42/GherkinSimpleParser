@@ -20,21 +20,21 @@ var gherkinObj = GherkinObject.Parse(inputLines));
 * `When` (unique)
 * `Then`
 * `And` (then, multiple)
+* `"""` (Doc Strings) (for Given, Then)
 
 ## Ignores
 * Empty lines
 * `#` (Comments)
 
-## DO NOT support
-* Guard clause for wrongly structured files
-* Unexpected lines (will throw exception)
+## DO NOT support (will throw exception)
+* Guard clause for wrongly structured files and unexpected lines
 * Multiple `Feature` per file
+* `Rule`
 * `Example`
 * `But`
 * `*`
 * `Scenario Outline` (or `Scenario Template`)
 * `Examples` (or `Scenarios`)
-* `"""` (Doc Strings)
 * `|` (Data Tables)
 * `@` (Tags)
 
@@ -45,6 +45,10 @@ var gherkinObj = GherkinObject.Parse(inputLines));
 Using the applicaiton extension `GherkinSimpleParser.Converter` you have access to the class `ExcelConverter` that exports the GherkinObject to a predefined Excel TestPlan.
 
 ## Export as CSV
+
+### To be noted
+
+New lines and carriage return are removed from Doc strings (`"""`).
 
 ### Export as CSV for testplan with \<speparator> for ANDs
 
@@ -93,7 +97,7 @@ into
 
 ### Export as CSV for testplan in Excel with formula wrap
 
-**LIMITATION: GIVENs and THENs text can only be 255 character longs because excel is annoying.**
+**LIMITATION: GIVENs and THENs text can only be 255 character longs because excel is annoying. Hence, DocStrings are not exported in this mode**
 
 ```csharp
 GherkinObject gherkinObj = GherkinObject.Parse(inputLines));
