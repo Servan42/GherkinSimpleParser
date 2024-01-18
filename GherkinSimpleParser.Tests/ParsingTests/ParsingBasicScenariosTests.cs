@@ -18,7 +18,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse(); 
 
             // Then
             Assert.That(result.FeatureName, Is.EqualTo("myFeature"));
@@ -34,7 +34,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.That(result.Scenarios.First().Name, Is.EqualTo("Should do something"));
@@ -53,7 +53,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.That(result.Scenarios.First().Givens.First().MainLine, Is.EqualTo("prerequisite"));
@@ -75,7 +75,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.That(result.Scenarios.First().Givens.Last().MainLine, Is.EqualTo("prerequisite1"));
@@ -95,7 +95,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.That(result.Scenarios.First().When, Is.EqualTo("action"));
@@ -115,7 +115,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.That(result.Scenarios.First().Thens.First().MainLine, Is.EqualTo("result"));
@@ -138,7 +138,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.That(result.Scenarios.First().Thens.Last().MainLine, Is.EqualTo("result1"));
@@ -163,7 +163,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.Multiple(() =>
@@ -194,7 +194,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            Assert.Throws<ArgumentException>(() => GherkinObject.Parse(inputLines));
+            Assert.Throws<ArgumentException>(() => new GherkinObjectParser(inputLines).Parse());
         }
 
         [Test]
@@ -208,7 +208,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            Assert.Throws<ArgumentException>(() => GherkinObject.Parse(inputLines));
+            Assert.Throws<ArgumentException>(() => new GherkinObjectParser(inputLines).Parse());
         }
     }
 }

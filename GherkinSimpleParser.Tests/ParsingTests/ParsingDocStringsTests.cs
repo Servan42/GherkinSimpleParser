@@ -50,7 +50,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.Multiple(() =>
@@ -104,7 +104,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.Multiple(() =>

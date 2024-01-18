@@ -19,7 +19,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.That(result.FeatureTags[0], Is.EqualTo("@featuretag"));
@@ -48,7 +48,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             Assert.That(result.Scenarios.First().Tags[0], Is.EqualTo("@scenarioTag1"));
@@ -78,7 +78,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When
-            var result = GherkinObject.Parse(inputLines);
+            var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
             CollectionAssert.AreEquivalent(new List<string> { "@featuretag0", "@featuretag1", "@featuretag2", "@featuretag3", "@featuretag4" }, result.FeatureTags);
@@ -103,7 +103,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             };
 
             // When/Then
-            Assert.Throws<ArgumentException>(() => GherkinObject.Parse(inputLines));
+            Assert.Throws<ArgumentException>(() => new GherkinObjectParser(inputLines).Parse());
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
                 "       Then c",
             };
 
-            var gherkinObject = GherkinObject.Parse(inputLines);
+            var gherkinObject = new GherkinObjectParser(inputLines).Parse();
 
             // When
             var dict = gherkinObject.GetScenariosByTag();
