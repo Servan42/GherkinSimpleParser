@@ -13,7 +13,7 @@ try
 	{
 		Console.WriteLine(filepath);
 		var lines = File.ReadAllLines(filepath).ToList();
-		var obj = GherkinObject.Parse(lines);
+		var obj = new GherkinObjectParser(lines).Parse();
 		//File.WriteAllLines(@$"{outputDirPath}/{Path.GetFileName(filepath)}.csv", obj.ExportAsCSVWithExcelFormulaWrap_FR());
 		gherkinObjs.Add(obj);
 	}

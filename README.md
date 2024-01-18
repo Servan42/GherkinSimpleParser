@@ -21,6 +21,7 @@ var gherkinObj = GherkinObject.Parse(inputLines));
 * `Then`
 * `And` (then, multiple)
 * `"""` (Doc Strings) (for Given, Then)
+* `@` (Tags) (Before Scenario and Feature)
 
 ## Ignores
 * Empty lines
@@ -36,9 +37,12 @@ var gherkinObj = GherkinObject.Parse(inputLines));
 * `Scenario Outline` (or `Scenario Template`)
 * `Examples` (or `Scenarios`)
 * `|` (Data Tables)
-* `@` (Tags)
 
 # Exports
+
+## DO NOT exports
+
+* Tags
 
 ## Export as Excel using EPPlus Excel library
 
