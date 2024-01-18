@@ -23,10 +23,10 @@ namespace GherkinSimpleParser.Tests
                 FeatureName = "feature name",
                 Background = new Background
                 {
-                    Givens = new List<string>
+                    Givens = new List<Instruction>
                     {
-                        "Prerequisite_0.1",
-                        "Prere\"q\"uisite_0.2"
+                        new("Prerequisite_0.1"),
+                        new("Prere\"q\"uisite_0.2")
                     }
                 },
                 Scenarios = new List<Scenario>
@@ -34,31 +34,31 @@ namespace GherkinSimpleParser.Tests
                     new Scenario
                     {
                         Name = "Test Case 1",
-                        Givens = new List<string>
+                        Givens = new List<Instruction>
                         {
-                            "Prerequisite_1.1",
-                            "Prere\"q\"uisite_1.2"
+                            new("Prerequisite_1.1"),
+                            new("Prere\"q\"uisite_1.2")
                         },
                         When = "Action_1",
-                        Thens = new List<string>
+                        Thens = new List<Instruction>
                         {
-                            "Result_1.1",
-                            "Resu\"l\"t_1.2"
+                            new("Result_1.1"),
+                            new("Resu\"l\"t_1.2")
                         },
                     },
                     new Scenario
                     {
                         Name = "Test Case 2",
-                        Givens = new List<string>
+                        Givens = new List<Instruction>
                         {
-                            "Prerequisite_2.1",
-                            "Prere\"q\"uisite_2.2"
+                            new("Prerequisite_2.1"),
+                            new("Prere\"q\"uisite_2.2")
                         },
                         When = "Action_2",
-                        Thens = new List<string>
+                        Thens = new List<Instruction>
                         {
-                            "Result_2.1",
-                            "Resu\"l\"t_2.2"
+                            new("Result_2.1"),
+                            new("Resu\"l\"t_2.2")
                         }
                     }
                 }
@@ -81,6 +81,33 @@ namespace GherkinSimpleParser.Tests
                 ";GENERAL PREREQUISITES:|Prerequisite_0.1|Prere\"q\"uisite_0.2;;",
                 "1;Test Case 1;;",
                 ";Prerequisite_1.1|Prere\"q\"uisite_1.2;Action_1;Result_1.1|Resu\"l\"t_1.2",
+                "2;Test Case 2;;",
+                ";Prerequisite_2.1|Prere\"q\"uisite_2.2;Action_2;Result_2.1|Resu\"l\"t_2.2"
+            },
+            csvResult);
+        }
+
+        [Test]
+        public void Should_export_as_CSV_withdocstrings()
+        {
+            // Given
+            var converter = new CSVConverter();
+            gherkinObject.Scenarios.First().Givens.First().DocStrings = new List<string>
+            {
+                "docstrings1",
+                "docstrings2",
+            };
+
+            // When
+            var csvResult = converter.ExportAsCSV("|", gherkinObject);
+
+            // Then
+            CollectionAssert.AreEqual(new List<string>()
+            {
+                "Number;GIVEN;WHEN;THEN",
+                ";GENERAL PREREQUISITES:|Prerequisite_0.1|Prere\"q\"uisite_0.2;;",
+                "1;Test Case 1;;",
+                ";Prerequisite_1.1 \"docstrings1 docstrings2\"|Prere\"q\"uisite_1.2;Action_1;Result_1.1|Resu\"l\"t_1.2",
                 "2;Test Case 2;;",
                 ";Prerequisite_2.1|Prere\"q\"uisite_2.2;Action_2;Result_2.1|Resu\"l\"t_2.2"
             },
