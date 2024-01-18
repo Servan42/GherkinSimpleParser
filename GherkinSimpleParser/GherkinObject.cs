@@ -8,69 +8,122 @@ namespace GherkinSimpleParser
         public Background Background { get; set; } = new();
         public List<Scenario> Scenarios { get; set; } = new();
 
+        private enum FillingState
+        {
+            OTHER,
+            BACKGROUND_GIVEN,
+            SCENARIO_GIVEN,
+            SCENARIO_THEN,
+        }
+
+        private class StateMachineException : Exception
+        {
+            public StateMachineException(string? message) : base(message)
+            {
+            }
+        }
+
         public static GherkinObject Parse(List<string> inputLines)
         {
             var result = new GherkinObject();
             Scenario currentScenario = new();
-            string andFillingState = "";
+            FillingState fillingState = FillingState.OTHER;
             int featureCount = 0;
             int backgroundCount = 0;
+
+            Queue<string> linesStack = new Queue<string>(inputLines);
+
+            string currentLine;
+            string trimedLine;
             int lineCount = 0;
 
-            foreach (var line in inputLines.Select(l => l.Trim()))
+            while (linesStack.Count > 0)
             {
+                currentLine = linesStack.Dequeue();
                 lineCount++;
-                if (line.StartsWith("#") || string.IsNullOrEmpty(line))
+                trimedLine = currentLine.Trim();
+
+                if (trimedLine.StartsWith("#") || string.IsNullOrEmpty(trimedLine))
                 {
                     continue;
                 }
-                else if (line.StartsWith("Feature: "))
+                else if (trimedLine.StartsWith("Feature: "))
                 {
                     if (featureCount > 0)
                         throw new ArgumentException($"Line {lineCount}: Do not support multiple features in one file", nameof(inputLines));
-                    result.FeatureName = line.Substring(9);
+                    result.FeatureName = trimedLine.Substring(9);
                     featureCount++;
+                    fillingState = FillingState.OTHER;
                 }
-                else if (line.StartsWith("Background:"))
+                else if (trimedLine.StartsWith("Background:"))
                 {
                     if (backgroundCount > 0)
                         throw new ArgumentException($"Line {lineCount}: Do not support multiple Background in one file", nameof(inputLines));
                     backgroundCount++;
+                    fillingState = FillingState.BACKGROUND_GIVEN;
                 }
-                else if (line.StartsWith("Scenario: "))
+                else if (trimedLine.StartsWith("Scenario: "))
                 {
-                    currentScenario = new Scenario { Name = line.Substring(10) };
+                    currentScenario = new Scenario { Name = trimedLine.Substring(10) };
                     result.Scenarios.Add(currentScenario);
-                    andFillingState = "SCENARIO_GIVEN";
+                    fillingState = FillingState.SCENARIO_GIVEN;
                 }
-                else if (line.StartsWith("Given "))
+                else if (trimedLine.StartsWith("Given "))
                 {
-                    if (andFillingState == "SCENARIO_GIVEN")
-                        currentScenario.Givens.Add(new Instruction(line.Substring(6)));
-                    else
-                        result.Background.Givens.Add(new Instruction(line.Substring(6)));
+                    if (fillingState == FillingState.SCENARIO_GIVEN)
+                        currentScenario.Givens.Add(new Instruction(trimedLine.Substring(6)));
+                    else if(fillingState == FillingState.BACKGROUND_GIVEN)
+                        result.Background.Givens.Add(new Instruction(trimedLine.Substring(6)));
                 }
-                else if (line.StartsWith("When "))
+                else if (trimedLine.StartsWith("When "))
                 {
-                    currentScenario.When = line.Substring(5);
+                    currentScenario.When = trimedLine.Substring(5);
                 }
-                else if (line.StartsWith("Then "))
+                else if (trimedLine.StartsWith("Then "))
                 {
-                    currentScenario.Thens.Add(new Instruction(line.Substring(5)));
-                    andFillingState = "SCENARIO_THEN";
+                    currentScenario.Thens.Add(new Instruction(trimedLine.Substring(5)));
+                    fillingState = FillingState.SCENARIO_THEN;
                 }
-                else if (line.StartsWith("And "))
+                else if (trimedLine.StartsWith("And "))
                 {
-                    if (andFillingState == "SCENARIO_GIVEN")
-                        currentScenario.Givens.Add(new Instruction(line.Substring(4)));
-                    else if (andFillingState == "SCENARIO_THEN")
-                        currentScenario.Thens.Add(new Instruction(line.Substring(4)));
-                    else
-                        result.Background.Givens.Add(new Instruction(line.Substring(4)));
+                    if (fillingState == FillingState.SCENARIO_GIVEN)
+                        currentScenario.Givens.Add(new Instruction(trimedLine.Substring(4)));
+                    else if (fillingState == FillingState.SCENARIO_THEN)
+                        currentScenario.Thens.Add(new Instruction(trimedLine.Substring(4)));
+                    else if (fillingState == FillingState.BACKGROUND_GIVEN)
+                        result.Background.Givens.Add(new Instruction(trimedLine.Substring(4)));
+                }
+                else if(trimedLine.StartsWith("\"\"\""))
+                {
+                    int indentCountReference = currentLine.IndexOf('"');
+                    currentLine = linesStack.Dequeue();
+                    lineCount++;
+                    while (!currentLine.Trim().StartsWith("\"\"\""))
+                    {
+                        int firstCharIndex = string.IsNullOrEmpty(currentLine) ? 0 : currentLine.IndexOf(currentLine.Trim().First());
+                        int leadingZerosToAdd = firstCharIndex - indentCountReference >= 0 ? firstCharIndex - indentCountReference : 0;
+                        string indentedLine = new string(' ', leadingZerosToAdd) + currentLine.Trim();
+                        switch (fillingState)
+                        {
+                            case FillingState.BACKGROUND_GIVEN:
+                                result.Background.Givens.Last().DocStrings.Add(indentedLine);
+                                break;
+                            case FillingState.SCENARIO_GIVEN:
+                                currentScenario.Givens.Last().DocStrings.Add(indentedLine);
+                                break;
+                            case FillingState.SCENARIO_THEN:
+                                currentScenario.Thens.Last().DocStrings.Add(indentedLine);
+                                break;
+                            default:
+                                throw new StateMachineException($"State {fillingState} is not allowed to contain DocString");
+                        }
+                        currentLine = linesStack.Dequeue();
+                        lineCount++;
+                    }
                 }
                 else
                 {
-                    throw new ArgumentException($"Line {lineCount}: Unsupported line: \"{line}\"", nameof(inputLines));
+                    throw new ArgumentException($"Line {lineCount}: Unsupported line: \"{trimedLine}\"", nameof(inputLines));
                 }
             }
 
