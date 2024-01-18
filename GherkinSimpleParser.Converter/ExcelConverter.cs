@@ -76,11 +76,7 @@ namespace GherkinSimpleParser.Converter
             {
                 var generalPrerequisite = new StringBuilder();
                 generalPrerequisite.AppendLine("GENERAL PREREQUISITES:");
-                foreach (var prerequisite in featureAndScenarios.Background.Givens)
-                {
-                    generalPrerequisite.Append("- ");
-                    generalPrerequisite.AppendLine(prerequisite.MainLine);
-                }
+                generalPrerequisite.AppendLine(BuildInstructionBatch(featureAndScenarios.Background.Givens));
 
                 ws.Cells[$"B{lineToFillId}"].Value = generalPrerequisite.ToString();
                 ws.Cells[$"B{lineToFillId}"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -99,16 +95,31 @@ namespace GherkinSimpleParser.Converter
                 SetColor(ws, $"A{lineToFillId}:F{lineToFillId}", Color.FromArgb(255, 180, 198, 231));
                 lineToFillId++;
 
-                string givens = string.Join('\n', scenario.Givens.Select(x => "- " + x.MainLine));
-                ws.Cells[$"B{lineToFillId}"].Value = givens;
+                ws.Cells[$"B{lineToFillId}"].Value = BuildInstructionBatch(scenario.Givens);
                 ws.Cells[$"C{lineToFillId}"].Value = scenario.When;
-                string thens = string.Join('\n', scenario.Thens.Select(x => "- " + x.MainLine));
-                ws.Cells[$"D{lineToFillId}"].Value = thens;
+                ws.Cells[$"D{lineToFillId}"].Value = BuildInstructionBatch(scenario.Thens);
                 ws.Cells[$"A{lineToFillId}:F{lineToFillId}"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 lineToFillId++;
                 testId++;
             }
+        }
+
+        private string BuildInstructionBatch(List<Instruction> instructions)
+        {
+            StringBuilder sb = new();
+            foreach (var instruction in instructions)
+            {
+                sb.Append("- ").AppendLine(instruction.MainLine);
+                if (instruction.DocStrings.Count > 0)
+                {
+                    sb.AppendLine("\"");
+                    foreach (var docstring in instruction.DocStrings)
+                        sb.AppendLine(docstring);
+                    sb.AppendLine("\"");
+                }
+            }
+            return sb.ToString();
         }
     }
 }
