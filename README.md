@@ -120,3 +120,7 @@ into
 "2;Test Case 2;;",
 ";="Prerequisite_2.1" & CHAR(10) & "Prere""q""uisite_2.2";Action_2;="Result_2.1" & CHAR(10) & "Resu""l""t_2.2""            
 ```
+
+# More information
+
+https://github.com/Servan42/GherkinSimpleParser
