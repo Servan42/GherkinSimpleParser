@@ -94,6 +94,7 @@ namespace GherkinSimpleParser
                         result.Scenarios.Last().Whens.Last().DataTable.Add(tableRow);
                         break;
                     case FillingState.SCENARIO_THEN:
+                        result.Scenarios.Last().Thens.Last().DataTable.Add(tableRow);
                         break;
                     default:
                         break;

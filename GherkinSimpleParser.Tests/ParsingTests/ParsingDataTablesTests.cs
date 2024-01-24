@@ -110,5 +110,37 @@ namespace GherkinSimpleParser.Tests.ParsingTests
                 new List<string>{ "w4.2", "w5.2", "w6.2" },
             }, instruciton.DataTable);
         }
+
+        [Test]
+        public void Should_parse_a_data_table_for_scenario_then()
+        {
+            // When
+            var result = new GherkinObjectParser(completeInputLines).Parse();
+
+            // Then
+            var instruciton = result.Scenarios[0].Thens[0];
+            Assert.That(instruciton.MainLine, Is.EqualTo("result"));
+            CollectionAssert.AreEqual(new List<List<string>>
+            {
+                new List<string>{ "t1.1", "t2.1", "t3.1" },
+                new List<string>{ "t4.1", "t5.1", "t6.1" },
+            }, instruciton.DataTable);
+        }
+
+        [Test]
+        public void Should_parse_a_data_table_for_scenario_then_and()
+        {
+            // When
+            var result = new GherkinObjectParser(completeInputLines).Parse();
+
+            // Then
+            var instruciton = result.Scenarios[0].Thens[1];
+            Assert.That(instruciton.MainLine, Is.EqualTo("result1"));
+            CollectionAssert.AreEqual(new List<List<string>>
+            {
+                new List<string>{ "t1.2", "t2.2", "t3.2" },
+                new List<string>{ "t4.2", "t5.2", "t6.2" },
+            }, instruciton.DataTable);
+        }
     }
 }
