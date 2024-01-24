@@ -41,6 +41,7 @@ namespace GherkinSimpleParser
             OTHER,
             BACKGROUND_GIVEN,
             SCENARIO_GIVEN,
+            SCENARIO_WHEN,
             SCENARIO_THEN,
         }
 
@@ -88,6 +89,8 @@ namespace GherkinSimpleParser
                         break;
                     case FillingState.SCENARIO_GIVEN:
                         result.Scenarios.Last().Givens.Last().DataTable.Add(tableRow);
+                        break;
+                    case FillingState.SCENARIO_WHEN:
                         break;
                     case FillingState.SCENARIO_THEN:
                         break;
@@ -152,6 +155,7 @@ namespace GherkinSimpleParser
         private void HandleWhenLine()
         {
             currentScenario.When = TrimedLine.Substring(5);
+            fillingState = FillingState.SCENARIO_WHEN;
         }
 
         private void HandleGivenLine()

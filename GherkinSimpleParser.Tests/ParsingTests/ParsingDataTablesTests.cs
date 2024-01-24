@@ -59,5 +59,21 @@ namespace GherkinSimpleParser.Tests.ParsingTests
                 new List<string>{ "Alice", "", "@alice" }
             }, instruciton.DataTable);
         }
+
+        [Test]
+        public void Should_parse_a_data_table_for_scenario_given_and()
+        {
+            // When
+            var result = new GherkinObjectParser(completeInputLines).Parse();
+
+            // Then
+            var instruciton = result.Scenarios[0].Givens[1];
+            Assert.That(instruciton.MainLine, Is.EqualTo("prerequisite3"));
+            CollectionAssert.AreEqual(new List<List<string>>
+            {
+                new List<string>{ "1", "2", "3" },
+                new List<string>{ "4", "5", "6" },
+            }, instruciton.DataTable);
+        }
     }
 }
