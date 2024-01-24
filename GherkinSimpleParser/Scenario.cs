@@ -4,7 +4,7 @@
     {
         public string Name { get; set; }
         public List<Instruction> Givens { get; set; } = new();
-        public string When { get; set; }
+        public List<Instruction> Whens { get; set; } = new();
         public List<Instruction> Thens { get; set; } = new();
         public List<string> Tags { get; set; }
     }

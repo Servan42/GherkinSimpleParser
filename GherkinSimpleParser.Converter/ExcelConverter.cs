@@ -88,7 +88,7 @@ namespace GherkinSimpleParser.Converter
                 lineToFillId++;
 
                 ws.Cells[$"B{lineToFillId}"].Value = BuildInstructionBatch(scenario.Givens);
-                ws.Cells[$"C{lineToFillId}"].Value = scenario.When;
+                ws.Cells[$"C{lineToFillId}"].Value = BuildInstructionBatch(scenario.Whens);
                 ws.Cells[$"D{lineToFillId}"].Value = BuildInstructionBatch(scenario.Thens);
                 ws.AlignCenter($"A{lineToFillId}:F{lineToFillId}", true, false);
 
@@ -103,15 +103,32 @@ namespace GherkinSimpleParser.Converter
             foreach (var instruction in instructions)
             {
                 sb.Append("- ").AppendLine(instruction.MainLine);
-                if (instruction.DocStrings.Count > 0)
-                {
-                    sb.AppendLine("\"");
-                    foreach (var docstring in instruction.DocStrings)
-                        sb.AppendLine(docstring);
-                    sb.AppendLine("\"");
-                }
+                AddDocStringsToBatch(sb, instruction);
+                AddDataTablesToBatch(sb, instruction);
             }
             return RemoveLastNewLine(sb.ToString());
+        }
+
+        private void AddDocStringsToBatch(StringBuilder sb, Instruction instruction)
+        {
+            if (instruction.DocStrings.Count == 0)
+                return;
+
+            sb.AppendLine("\"");
+            foreach (var docstring in instruction.DocStrings)
+                sb.AppendLine(docstring);
+            sb.AppendLine("\"");
+        }
+
+        private void AddDataTablesToBatch(StringBuilder sb, Instruction instruction)
+        {
+            if (instruction.DataTable.Count == 0)
+                return;
+         
+            sb.AppendLine("\"");
+            foreach (var tableRow in instruction.DocStrings)
+                sb.AppendLine(string.Join(" | ", tableRow));
+            sb.AppendLine("\"");
         }
 
         private string RemoveLastNewLine(string s)

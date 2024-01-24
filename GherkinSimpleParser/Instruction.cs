@@ -9,5 +9,6 @@
 
         public string MainLine { get; set; }
         public List<string> DocStrings { get; set; } = new();
+        public GherkinDataTable DataTable { get; set; } = new();
     }
 }

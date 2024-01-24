@@ -17,10 +17,12 @@ var gherkinObj = new GherkinObjectParser(lines).Parse();
 * `Scenario` (multiple)
 * `Given`
 * `And` (given, multiple)
-* `When` (unique)
+* `When`
+* `And` (when, multiple)
 * `Then`
 * `And` (then, multiple)
-* `"""` (Doc Strings) (for Given, Then)
+* `"""` (Doc Strings) (for Given, When, Then, And)
+* `|` (Data Tables) (for Given, When, Then, And)
 * `@` (Tags) (Before Scenario and Feature)
 
 ## Ignores
@@ -36,7 +38,6 @@ var gherkinObj = new GherkinObjectParser(lines).Parse();
 * `*`
 * `Scenario Outline` (or `Scenario Template`)
 * `Examples` (or `Scenarios`)
-* `|` (Data Tables)
 
 # Exports
 
@@ -52,7 +53,7 @@ Using the applicaiton extension `GherkinSimpleParser.Converter` you have access 
 
 ### To be noted
 
-New lines and carriage return are removed from Doc strings (`"""`).
+New lines and carriage return are removed from Doc strings (`"""`) and from Data Tables (`|`).
 
 ### Export as CSV for testplan with \<speparator> for ANDs
 

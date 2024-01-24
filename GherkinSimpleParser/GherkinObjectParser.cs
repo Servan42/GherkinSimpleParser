@@ -10,7 +10,7 @@ namespace GherkinSimpleParser
     {
         private readonly List<string> inputLines;
         private readonly GherkinObject result;
-        private readonly Queue<string> linesStack;
+        private readonly Stack<string> linesStack;
 
         private Scenario currentScenario;
         private FillingState fillingState;
@@ -24,7 +24,9 @@ namespace GherkinSimpleParser
         public GherkinObjectParser(List<string> inputLines)
         {
             this.inputLines = inputLines;
-            linesStack = new Queue<string>(inputLines);
+            var inputLineReversed = new List<string>(inputLines);
+            inputLineReversed.Reverse();
+            linesStack = new Stack<string>(inputLineReversed);
             result = new GherkinObject();
 
             fillingState = FillingState.OTHER;
@@ -39,6 +41,7 @@ namespace GherkinSimpleParser
             OTHER,
             BACKGROUND_GIVEN,
             SCENARIO_GIVEN,
+            SCENARIO_WHEN,
             SCENARIO_THEN,
         }
 
@@ -53,7 +56,7 @@ namespace GherkinSimpleParser
         {
             while (linesStack.Count > 0)
             {
-                currentLine = linesStack.Dequeue();
+                currentLine = linesStack.Pop();
                 lineCount++;
 
                 if (TrimedLine.StartsWith("#") || string.IsNullOrEmpty(TrimedLine)) continue;
@@ -66,18 +69,51 @@ namespace GherkinSimpleParser
                 else if (TrimedLine.StartsWith("Then ")) HandleThenLine();
                 else if (TrimedLine.StartsWith("And ")) HandleAndLine();
                 else if (TrimedLine.StartsWith("\"\"\"")) HandleDocStringsBlock();
+                else if (TrimedLine.StartsWith("|")) HandleDataTableBlock();
                 else throw new ArgumentException($"Line {lineCount}: Unsupported line: \"{TrimedLine}\"", nameof(inputLines));
             }
 
             return result;
         }
 
+        private void HandleDataTableBlock()
+        {
+            while (TrimedLine.StartsWith("|"))
+            {
+                var tableRow = TrimedLine.Split("|", StringSplitOptions.TrimEntries).Skip(1).SkipLast(1).ToList();
+                switch (fillingState)
+                {
+                    case FillingState.BACKGROUND_GIVEN:
+                        result.Background.Givens.Last().DataTable.Add(tableRow);
+                        break;
+                    case FillingState.SCENARIO_GIVEN:
+                        currentScenario.Givens.Last().DataTable.Add(tableRow);
+                        break;
+                    case FillingState.SCENARIO_WHEN:
+                        currentScenario.Whens.Last().DataTable.Add(tableRow);
+                        break;
+                    case FillingState.SCENARIO_THEN:
+                        currentScenario.Thens.Last().DataTable.Add(tableRow);
+                        break;
+                    default:
+                        break;
+                }
+
+                if (linesStack.Count == 0)
+                    return;
+
+                currentLine = linesStack.Pop();
+                lineCount++;
+            }
+            linesStack.Push(currentLine);
+        }
+
         private void HandleDocStringsBlock()
         {
             int indentCountReference = currentLine.IndexOf('"');
-            currentLine = linesStack.Dequeue();
+            currentLine = linesStack.Pop();
             lineCount++;
-            while (!currentLine.Trim().StartsWith("\"\"\""))
+            while (!TrimedLine.StartsWith("\"\"\""))
             {
                 int firstCharIndex = string.IsNullOrEmpty(currentLine) ? 0 : currentLine.IndexOf(currentLine.Trim().First());
                 int leadingZerosToAdd = firstCharIndex - indentCountReference >= 0 ? firstCharIndex - indentCountReference : 0;
@@ -90,25 +126,39 @@ namespace GherkinSimpleParser
                     case FillingState.SCENARIO_GIVEN:
                         currentScenario.Givens.Last().DocStrings.Add(indentedLine);
                         break;
+                    case FillingState.SCENARIO_WHEN:
+                        currentScenario.Whens.Last().DocStrings.Add(indentedLine);
+                        break;
                     case FillingState.SCENARIO_THEN:
                         currentScenario.Thens.Last().DocStrings.Add(indentedLine);
                         break;
                     default:
                         throw new StateMachineException($"State {fillingState} is not allowed to contain DocString");
                 }
-                currentLine = linesStack.Dequeue();
+                currentLine = linesStack.Pop();
                 lineCount++;
             }
         }
 
         private void HandleAndLine()
         {
-            if (fillingState == FillingState.SCENARIO_GIVEN)
-                currentScenario.Givens.Add(new Instruction(TrimedLine.Substring(4)));
-            else if (fillingState == FillingState.SCENARIO_THEN)
-                currentScenario.Thens.Add(new Instruction(TrimedLine.Substring(4)));
-            else if (fillingState == FillingState.BACKGROUND_GIVEN)
-                result.Background.Givens.Add(new Instruction(TrimedLine.Substring(4)));
+            switch (fillingState)
+            {
+                case FillingState.BACKGROUND_GIVEN:
+                    result.Background.Givens.Add(new Instruction(TrimedLine.Substring(4)));
+                    break;
+                case FillingState.SCENARIO_GIVEN:
+                    currentScenario.Givens.Add(new Instruction(TrimedLine.Substring(4)));
+                    break;
+                case FillingState.SCENARIO_WHEN:
+                    currentScenario.Whens.Add(new Instruction(TrimedLine.Substring(4)));
+                    break;
+                case FillingState.SCENARIO_THEN:
+                    currentScenario.Thens.Add(new Instruction(TrimedLine.Substring(4)));
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void HandleThenLine()
@@ -119,7 +169,8 @@ namespace GherkinSimpleParser
 
         private void HandleWhenLine()
         {
-            currentScenario.When = TrimedLine.Substring(5);
+            currentScenario.Whens.Add(new Instruction(TrimedLine.Substring(5)));
+            fillingState = FillingState.SCENARIO_WHEN;
         }
 
         private void HandleGivenLine()
