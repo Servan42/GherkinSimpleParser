@@ -17,7 +17,8 @@ var gherkinObj = new GherkinObjectParser(lines).Parse();
 * `Scenario` (multiple)
 * `Given`
 * `And` (given, multiple)
-* `When` (unique)
+* `When`
+* `And` (when, multiple)
 * `Then`
 * `And` (then, multiple)
 * `"""` (Doc Strings) (for Given, Then)
