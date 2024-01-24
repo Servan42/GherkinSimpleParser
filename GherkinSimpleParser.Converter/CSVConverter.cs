@@ -26,7 +26,7 @@ namespace GherkinSimpleParser.Converter
             {
                 csv.Add($"{testCount};{scenario.Name};;");
                 string givenCol = BuildInstructionBatchLine(separator, scenario.Givens);
-                string whenCol = scenario.When;
+                string whenCol = BuildInstructionBatchLine(separator, scenario.Whens);
                 string thenCol = BuildInstructionBatchLine(separator, scenario.Thens);
                 csv.Add($";{givenCol};{whenCol};{thenCol}");
                 testCount++;
@@ -85,7 +85,7 @@ namespace GherkinSimpleParser.Converter
             {
                 csv.Add($"{testCount};{scenario.Name};;");
                 string givenCol = string.Join(separator, scenario.Givens.Select(g => g.MainLine.Replace("\"", "\"\"")));
-                string whenCol = scenario.When;
+                string whenCol = string.Join(separator, scenario.Whens.Select(g => g.MainLine.Replace("\"", "\"\"")));
                 string thenCol = string.Join(separator, scenario.Thens.Select(g => g.MainLine.Replace("\"", "\"\"")));
                 csv.Add($";=\"{givenCol}\";{whenCol};=\"{thenCol}\"");
                 testCount++;

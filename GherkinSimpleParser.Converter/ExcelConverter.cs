@@ -88,7 +88,7 @@ namespace GherkinSimpleParser.Converter
                 lineToFillId++;
 
                 ws.Cells[$"B{lineToFillId}"].Value = BuildInstructionBatch(scenario.Givens);
-                ws.Cells[$"C{lineToFillId}"].Value = scenario.When;
+                ws.Cells[$"C{lineToFillId}"].Value = BuildInstructionBatch(scenario.Whens);
                 ws.Cells[$"D{lineToFillId}"].Value = BuildInstructionBatch(scenario.Thens);
                 ws.AlignCenter($"A{lineToFillId}:F{lineToFillId}", true, false);
 

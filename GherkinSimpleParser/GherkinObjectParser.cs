@@ -138,12 +138,23 @@ namespace GherkinSimpleParser
 
         private void HandleAndLine()
         {
-            if (fillingState == FillingState.SCENARIO_GIVEN)
-                currentScenario.Givens.Add(new Instruction(TrimedLine.Substring(4)));
-            else if (fillingState == FillingState.SCENARIO_THEN)
-                currentScenario.Thens.Add(new Instruction(TrimedLine.Substring(4)));
-            else if (fillingState == FillingState.BACKGROUND_GIVEN)
-                result.Background.Givens.Add(new Instruction(TrimedLine.Substring(4)));
+            switch (fillingState)
+            {
+                case FillingState.BACKGROUND_GIVEN:
+                    result.Background.Givens.Add(new Instruction(TrimedLine.Substring(4)));
+                    break;
+                case FillingState.SCENARIO_GIVEN:
+                    currentScenario.Givens.Add(new Instruction(TrimedLine.Substring(4)));
+                    break;
+                case FillingState.SCENARIO_WHEN:
+                    currentScenario.Whens.Add(new Instruction(TrimedLine.Substring(4)));
+                    break;
+                case FillingState.SCENARIO_THEN:
+                    currentScenario.Thens.Add(new Instruction(TrimedLine.Substring(4)));
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void HandleThenLine()
@@ -154,7 +165,7 @@ namespace GherkinSimpleParser
 
         private void HandleWhenLine()
         {
-            currentScenario.When = TrimedLine.Substring(5);
+            currentScenario.Whens.Add(new Instruction(TrimedLine.Substring(5)));
             fillingState = FillingState.SCENARIO_WHEN;
         }
 

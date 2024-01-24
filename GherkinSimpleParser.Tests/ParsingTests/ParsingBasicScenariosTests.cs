@@ -98,8 +98,30 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             var result = new GherkinObjectParser(inputLines).Parse();
 
             // Then
-            Assert.That(result.Scenarios.First().When, Is.EqualTo("action"));
-            Assert.That(result.Scenarios.Last().When, Is.EqualTo("action2"));
+            Assert.That(result.Scenarios.First().Whens.First().MainLine, Is.EqualTo("action"));
+            Assert.That(result.Scenarios.Last().Whens.First().MainLine, Is.EqualTo("action2"));
+        }
+
+        [Test]
+        public void Should_parse_given_when_ands_for_scenario()
+        {
+            // Given
+            var inputLines = new List<string>
+            {
+                "   Scenario: Should do something",
+                "       When action",
+                "       And action1",
+                "   Scenario: Should do something else",
+                "       When action2",
+                "       And action3",
+            };
+
+            // When
+            var result = new GherkinObjectParser(inputLines).Parse();
+
+            // Then
+            Assert.That(result.Scenarios.First().Whens.Last().MainLine, Is.EqualTo("action1"));
+            Assert.That(result.Scenarios.Last().Whens.Last().MainLine, Is.EqualTo("action3"));
         }
 
         [Test]
