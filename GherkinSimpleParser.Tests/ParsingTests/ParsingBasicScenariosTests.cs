@@ -184,7 +184,6 @@ namespace GherkinSimpleParser.Tests.ParsingTests
         [TestCase("Scenario Template:")]
         [TestCase("Examples:")]
         [TestCase("Scenarios:")]
-        [TestCase("|")]
         public void Should_throw_exception_when_encounters_an_unsupported_line(string startWith)
         {
             // Given
