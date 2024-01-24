@@ -83,18 +83,17 @@ namespace GherkinSimpleParser
                 var tableRow = TrimedLine.Split("|", StringSplitOptions.TrimEntries).Skip(1).SkipLast(1).ToList();
                 switch (fillingState)
                 {
-                    case FillingState.OTHER:
-                        break;
                     case FillingState.BACKGROUND_GIVEN:
+                        result.Background.Givens.Last().DataTable.Add(tableRow);
                         break;
                     case FillingState.SCENARIO_GIVEN:
-                        result.Scenarios.Last().Givens.Last().DataTable.Add(tableRow);
+                        currentScenario.Givens.Last().DataTable.Add(tableRow);
                         break;
                     case FillingState.SCENARIO_WHEN:
-                        result.Scenarios.Last().Whens.Last().DataTable.Add(tableRow);
+                        currentScenario.Whens.Last().DataTable.Add(tableRow);
                         break;
                     case FillingState.SCENARIO_THEN:
-                        result.Scenarios.Last().Thens.Last().DataTable.Add(tableRow);
+                        currentScenario.Thens.Last().DataTable.Add(tableRow);
                         break;
                     default:
                         break;

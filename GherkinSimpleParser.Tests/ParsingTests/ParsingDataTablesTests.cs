@@ -47,6 +47,38 @@ namespace GherkinSimpleParser.Tests.ParsingTests
         }
 
         [Test]
+        public void Should_parse_a_data_table_for_background_given()
+        {
+            // When
+            var result = new GherkinObjectParser(completeInputLines).Parse();
+
+            // Then
+            var instruciton = result.Background.Givens[0];
+            Assert.That(instruciton.MainLine, Is.EqualTo("prerequisite"));
+            CollectionAssert.AreEqual(new List<List<string>>
+            {
+                new List<string>{ "bg1.1", "bg2.1", "bg3.1" },
+                new List<string>{ "bg4.1", "bg5.1", "bg6.1" },
+            }, instruciton.DataTable);
+        }
+
+        [Test]
+        public void Should_parse_a_data_table_for_background_given_and()
+        {
+            // When
+            var result = new GherkinObjectParser(completeInputLines).Parse();
+
+            // Then
+            var instruciton = result.Background.Givens[1];
+            Assert.That(instruciton.MainLine, Is.EqualTo("prerequisite1"));
+            CollectionAssert.AreEqual(new List<List<string>>
+            {
+                new List<string>{ "bg1.2", "bg2.2", "bg3.2" },
+                new List<string>{ "bg4.2", "bg5.2", "bg6.2" },
+            }, instruciton.DataTable);
+        }
+
+        [Test]
         public void Should_parse_a_data_table_for_scenario_given()
         {
             // When
