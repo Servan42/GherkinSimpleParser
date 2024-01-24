@@ -36,7 +36,16 @@ namespace GherkinSimpleParser.Tests.ParsingTests
                 "       docstring_sc_given_and_1",
                 "       docstring_sc_given_and_2",
                 "       \"\"\"",
-                "       When action",
+                "       When action1",
+                "       \"\"\"",
+                "       docstring_sc_when_1",
+                "       docstring_sc_when_2",
+                "       \"\"\"",
+                "       And action2",
+                "       \"\"\"",
+                "       docstring_sc_when_and_1",
+                "       docstring_sc_when_and_2",
+                "       \"\"\"",
                 "       Then result",
                 "       \"\"\"",
                 "       docstring_sc_then_1",
@@ -68,6 +77,13 @@ namespace GherkinSimpleParser.Tests.ParsingTests
                 CollectionAssert.AreEqual(
                     new List<string> { "docstring_sc_given_and_1", "docstring_sc_given_and_2" },
                     result.Scenarios.First().Givens.Last().DocStrings);
+
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_when_1", "docstring_sc_when_2" },
+                    result.Scenarios.First().Whens.First().DocStrings);
+                CollectionAssert.AreEqual(
+                    new List<string> { "docstring_sc_when_and_1", "docstring_sc_when_and_2" },
+                    result.Scenarios.First().Whens.Last().DocStrings);
 
                 CollectionAssert.AreEqual(
                     new List<string> { "docstring_sc_then_1", "docstring_sc_then_2" },

@@ -125,6 +125,9 @@ namespace GherkinSimpleParser
                     case FillingState.SCENARIO_GIVEN:
                         currentScenario.Givens.Last().DocStrings.Add(indentedLine);
                         break;
+                    case FillingState.SCENARIO_WHEN:
+                        currentScenario.Whens.Last().DocStrings.Add(indentedLine);
+                        break;
                     case FillingState.SCENARIO_THEN:
                         currentScenario.Thens.Last().DocStrings.Add(indentedLine);
                         break;
