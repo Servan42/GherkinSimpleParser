@@ -42,7 +42,11 @@ namespace GherkinSimpleParser.Tests.ParsingTests
                 "       | t4.1 | t5.1 | t6.1 |",
                 "       And result1",
                 "       | t1.2 | t2.2 | t3.2 |",
-                "       | t4.2 | t5.2 | t6.2 |"
+                "       | t4.2 | t5.2 | t6.2 |",
+                "   Scenario: Should do something else",
+                "       Given prerequisite sc2",
+                "       | sc2_g1.1 | sc2_g2.1 | sc2_g3.1 |",
+                "       | sc2_g4.1 | sc2_g5.1 | sc2_g6.1 |"
             };
         }
 
@@ -172,6 +176,22 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             {
                 new List<string>{ "t1.2", "t2.2", "t3.2" },
                 new List<string>{ "t4.2", "t5.2", "t6.2" },
+            }, instruciton.DataTable);
+        }
+
+        [Test]
+        public void Should_parse_a_data_table_for_scenario_2_given()
+        {
+            // When
+            var result = new GherkinObjectParser(completeInputLines).Parse();
+
+            // Then
+            var instruciton = result.Scenarios[1].Givens[0];
+            Assert.That(instruciton.MainLine, Is.EqualTo("prerequisite sc2"));
+            CollectionAssert.AreEqual(new List<List<string>>
+            {
+                new List<string>{ "sc2_g1.1", "sc2_g2.1", "sc2_g3.1" },
+                new List<string>{ "sc2_g4.1", "sc2_g5.1", "sc2_g6.1" },
             }, instruciton.DataTable);
         }
     }
