@@ -103,15 +103,32 @@ namespace GherkinSimpleParser.Converter
             foreach (var instruction in instructions)
             {
                 sb.Append("- ").AppendLine(instruction.MainLine);
-                if (instruction.DocStrings.Count > 0)
-                {
-                    sb.AppendLine("\"");
-                    foreach (var docstring in instruction.DocStrings)
-                        sb.AppendLine(docstring);
-                    sb.AppendLine("\"");
-                }
+                AddDocStringsToBatch(sb, instruction);
+                AddDataTablesToBatch(sb, instruction);
             }
             return RemoveLastNewLine(sb.ToString());
+        }
+
+        private void AddDocStringsToBatch(StringBuilder sb, Instruction instruction)
+        {
+            if (instruction.DocStrings.Count == 0)
+                return;
+
+            sb.AppendLine("\"");
+            foreach (var docstring in instruction.DocStrings)
+                sb.AppendLine(docstring);
+            sb.AppendLine("\"");
+        }
+
+        private void AddDataTablesToBatch(StringBuilder sb, Instruction instruction)
+        {
+            if (instruction.DataTable.Count == 0)
+                return;
+         
+            sb.AppendLine("\"");
+            foreach (var tableRow in instruction.DocStrings)
+                sb.AppendLine(string.Join(" | ", tableRow));
+            sb.AppendLine("\"");
         }
 
         private string RemoveLastNewLine(string s)

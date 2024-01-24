@@ -96,7 +96,7 @@ namespace GherkinSimpleParser.Tests
         }
 
         [Test]
-        public void Should_export_as_CSV_withdocstrings()
+        public void Should_export_as_CSV_with_docstrings()
         {
             // Given
             var converter = new CSVConverter();
@@ -116,6 +116,33 @@ namespace GherkinSimpleParser.Tests
                 ";GENERAL PREREQUISITES:|Prerequisite_0.1|Prere\"q\"uisite_0.2;;",
                 "1;Test Case 1;;",
                 ";Prerequisite_1.1 \"docstrings1 docstrings2\"|Prere\"q\"uisite_1.2;Action_1.1|Action_1.2;Result_1.1|Resu\"l\"t_1.2",
+                "2;Test Case 2;;",
+                ";Prerequisite_2.1|Prere\"q\"uisite_2.2;Action_2.1|Action_2.2;Result_2.1|Resu\"l\"t_2.2"
+            },
+            csvResult);
+        }
+
+        [Test]
+        public void Should_export_as_CSV_with_datatables()
+        {
+            // Given
+            var converter = new CSVConverter();
+            gherkinObject.Scenarios.First().Givens.First().DataTable = new GherkinDataTable
+            {
+                new List<string> { "t1", "t2" },
+                new List<string> { "t3", "t4" },
+            };
+
+            // When
+            var csvResult = converter.ExportAsCSV("|", gherkinObject);
+
+            // Then
+            CollectionAssert.AreEqual(new List<string>()
+            {
+                "Number;GIVEN;WHEN;THEN",
+                ";GENERAL PREREQUISITES:|Prerequisite_0.1|Prere\"q\"uisite_0.2;;",
+                "1;Test Case 1;;",
+                ";Prerequisite_1.1 \"t1 t2 t3 t4\"|Prere\"q\"uisite_1.2;Action_1.1|Action_1.2;Result_1.1|Resu\"l\"t_1.2",
                 "2;Test Case 2;;",
                 ";Prerequisite_2.1|Prere\"q\"uisite_2.2;Action_2.1|Action_2.2;Result_2.1|Resu\"l\"t_2.2"
             },

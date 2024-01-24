@@ -46,6 +46,15 @@ namespace GherkinSimpleParser.Converter
                 {
                     sb.Append(" \"").Append(string.Join(' ', instruction.DocStrings)).Append('"');
                 }
+                if (instruction.DataTable.Count > 0)
+                {
+                    var flattenedDataTable = new List<string>();
+                    foreach (var tableRow in instruction.DataTable)
+                    {
+                        flattenedDataTable.AddRange(tableRow);
+                    }
+                    sb.Append(" \"").Append(string.Join(' ', flattenedDataTable)).Append('"');
+                }
                 flattened.Add(sb.ToString());
             }
             return string.Join(separator, flattened);
