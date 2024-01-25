@@ -24,9 +24,10 @@ var gherkinObj = new GherkinObjectParser(lines).Parse();
 * `"""` (Doc Strings) (for Given, When, Then, And)
 * `|` (Data Tables) (for Given, When, Then, And)
 * `@` (Tags) (Before Scenario and Feature)
+* Markdown after `Feature`, `Background` and `Scenario`
 
 ## Ignores
-* Empty lines
+* Empty lines (except in Markdown blocks)
 * `#` (Comments)
 
 ## DO NOT support (will throw exception)
@@ -44,6 +45,7 @@ var gherkinObj = new GherkinObjectParser(lines).Parse();
 ## DO NOT exports
 
 * Tags
+* Markdown blocks
 
 ## Export as Excel using EPPlus Excel library
 

@@ -9,7 +9,7 @@ try
 	Directory.CreateDirectory(outputDirPath);
 
 	var gherkinObjs = new List<GherkinObject>();
-	foreach (var filepath in Directory.GetFiles(inputDirectoryPath).Where(f => f.Contains(".feature")))
+	foreach (var filepath in Directory.GetFiles(inputDirectoryPath).Where(f => f.EndsWith(".feature")))
 	{
 		Console.WriteLine(filepath);
 		var lines = File.ReadAllLines(filepath).ToList();

@@ -5,6 +5,7 @@ namespace GherkinSimpleParser
     public class GherkinObject
     {
         public string FeatureName { get; set; }
+        public List<string> MarkdownLines { get; set; } = new();
         public Background Background { get; set; } = new();
         public List<Scenario> Scenarios { get; set; } = new();
         public List<string> FeatureTags { get; set; }
