@@ -30,7 +30,7 @@ var gherkinObj = new GherkinObjectParser(lines).Parse();
 * Empty lines (except in Markdown blocks)
 * `#` (Comments)
 
-## DO NOT support (will throw exception)
+## DOES NOT support (will throw exception)
 * Guard clause for wrongly structured files and unexpected lines
 * Multiple `Feature` per file
 * `Rule`
