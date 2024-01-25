@@ -100,28 +100,6 @@ into
 ";Prerequisite_2.1|Prere"q"uisite_2.2;Action_2;Result_2.1|Resu"l"t_2.2"
 ```
 
-### Export as CSV for testplan in Excel with formula wrap
-
-**LIMITATION: GIVENs and THENs text can only be 255 character longs because excel is annoying. Hence, DocStrings are not exported in this mode**
-
-```csharp
-GherkinObject gherkinObj = GherkinObject.Parse(inputLines));
-string separator = "|";
-List<string> CSVLines = gherkinObj.ExportAsCSVWithExcelFormulaWrap_EN(separator));
-```
-Use `ExportAsCSVWithExcelFormulaWrap_FR` to have `CAR(10)` instead of `CHAR(10)` if you're french because Excel is annoying.
-
-Transforms the above .feature file\
-into
-```
-"Number;GIVEN;WHEN;THEN",
-";="GENERAL PREREQUISITES:" & CHAR(10) & "Prerequisite_0.1" & CHAR(10) & "Prere""q""uisite_0.2";;",
-"1;Test Case 1;;",
-";="Prerequisite_1.1" & CHAR(10) & "Prere""q""uisite_1.2";Action_1;="Result_1.1" & CHAR(10) & "Resu""l""t_1.2"",
-"2;Test Case 2;;",
-";="Prerequisite_2.1" & CHAR(10) & "Prere""q""uisite_2.2";Action_2;="Result_2.1" & CHAR(10) & "Resu""l""t_2.2""            
-```
-
 # More information
 
 https://github.com/Servan42/GherkinSimpleParser

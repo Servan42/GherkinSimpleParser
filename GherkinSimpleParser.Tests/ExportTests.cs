@@ -148,53 +148,5 @@ namespace GherkinSimpleParser.Tests
             },
             csvResult);
         }
-
-        [Test]
-        [Ignore("Deprecated")]
-        public void Should_export_as_CSV_excel_formula_wrap_french()
-        {
-            // Given
-            var converter = new CSVConverter();
-
-            // When
-            var csvResult = converter.ExportAsCSVWithExcelFormulaWrap_FR(gherkinObject);
-            var test = string.Join("\r\n", csvResult);
-
-            // Then
-            CollectionAssert.AreEqual(new List<string>()
-            {
-                "Number;GIVEN;WHEN;THEN",
-                ";=\"GENERAL PREREQUISITES:\" & CAR(10) & \"Prerequisite_0.1\" & CAR(10) & \"Prere\"\"q\"\"uisite_0.2\";;",
-                "1;Test Case 1;;",
-                ";=\"Prerequisite_1.1\" & CAR(10) & \"Prere\"\"q\"\"uisite_1.2\";Action_1;=\"Result_1.1\" & CAR(10) & \"Resu\"\"l\"\"t_1.2\"",
-                "2;Test Case 2;;",
-                ";=\"Prerequisite_2.1\" & CAR(10) & \"Prere\"\"q\"\"uisite_2.2\";Action_2;=\"Result_2.1\" & CAR(10) & \"Resu\"\"l\"\"t_2.2\""
-            },
-            csvResult);
-        }
-
-        [Test]
-        [Ignore("Deprecated")]
-        public void Should_export_as_CSV_excel_formula_wrap_english()
-        {
-            // Given
-            var converter = new CSVConverter();
-
-            // When
-            var csvResult = converter.ExportAsCSVWithExcelFormulaWrap_EN(gherkinObject);
-            var test = string.Join("\r\n", csvResult);
-
-            // Then
-            CollectionAssert.AreEqual(new List<string>()
-            {
-                "Number;GIVEN;WHEN;THEN",
-                ";=\"GENERAL PREREQUISITES:\" & CHAR(10) & \"Prerequisite_0.1\" & CHAR(10) & \"Prere\"\"q\"\"uisite_0.2\";;",
-                "1;Test Case 1;;",
-                ";=\"Prerequisite_1.1\" & CHAR(10) & \"Prere\"\"q\"\"uisite_1.2\";Action_1;=\"Result_1.1\" & CHAR(10) & \"Resu\"\"l\"\"t_1.2\"",
-                "2;Test Case 2;;",
-                ";=\"Prerequisite_2.1\" & CHAR(10) & \"Prere\"\"q\"\"uisite_2.2\";Action_2;=\"Result_2.1\" & CHAR(10) & \"Resu\"\"l\"\"t_2.2\""
-            },
-            csvResult);
-        }
     }
 }
