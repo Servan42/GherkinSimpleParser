@@ -19,6 +19,7 @@ namespace GherkinSimpleParser
         private List<string> lastSeenTags;
         private string currentLine;
         private int lineCount;
+        private int markdownIndexIndent;
         private string TrimedLine => currentLine.Trim();
 
         public GherkinObjectParser(List<string> inputLines)
@@ -39,6 +40,9 @@ namespace GherkinSimpleParser
         private enum FillingState
         {
             OTHER,
+            MARKDOWN_FEATURE,
+            MARKDOWN_BACKGROUND,
+            MARKDOWN_SCENARIO,
             BACKGROUND_GIVEN,
             SCENARIO_GIVEN,
             SCENARIO_WHEN,
@@ -59,7 +63,11 @@ namespace GherkinSimpleParser
                 currentLine = linesStack.Pop();
                 lineCount++;
 
-                if (TrimedLine.StartsWith("#") || string.IsNullOrEmpty(TrimedLine)) continue;
+                if (TrimedLine.StartsWith("#")) continue;
+                else if (string.IsNullOrEmpty(TrimedLine)
+                    && fillingState != FillingState.MARKDOWN_FEATURE
+                    && fillingState != FillingState.MARKDOWN_BACKGROUND
+                    && fillingState != FillingState.MARKDOWN_SCENARIO) continue;
                 else if (TrimedLine.StartsWith("@")) HandleTagLine();
                 else if (TrimedLine.StartsWith("Feature: ")) HandleFeatureLine();
                 else if (TrimedLine.StartsWith("Background:")) HandleBackgroundLine();
@@ -70,10 +78,29 @@ namespace GherkinSimpleParser
                 else if (TrimedLine.StartsWith("And ")) HandleAndLine();
                 else if (TrimedLine.StartsWith("\"\"\"")) HandleDocStringsBlock();
                 else if (TrimedLine.StartsWith("|")) HandleDataTableBlock();
-                else throw new ArgumentException($"Line {lineCount}: Unsupported line: \"{TrimedLine}\"", nameof(inputLines));
+                else HandleMarkdownOrThrow();
             }
 
             return result;
+        }
+
+        private void HandleMarkdownOrThrow()
+        {
+            string indentedLine = GetIndentedLine(markdownIndexIndent);
+            switch (fillingState)
+            {
+                case FillingState.MARKDOWN_FEATURE:
+                    result.MarkdownLines.Add(indentedLine);
+                    break;
+                case FillingState.MARKDOWN_BACKGROUND:
+                    result.Background.MarkdownLines.Add(indentedLine);
+                    break;
+                case FillingState.MARKDOWN_SCENARIO:
+                    currentScenario.MarkdownLines.Add(indentedLine);
+                    break;
+                default:
+                    throw new ArgumentException($"Line {lineCount}: Unsupported line: \"{TrimedLine}\"", nameof(inputLines));
+            }
         }
 
         private void HandleDataTableBlock()
@@ -115,9 +142,7 @@ namespace GherkinSimpleParser
             lineCount++;
             while (!TrimedLine.StartsWith("\"\"\""))
             {
-                int firstCharIndex = string.IsNullOrEmpty(currentLine) ? 0 : currentLine.IndexOf(currentLine.Trim().First());
-                int leadingZerosToAdd = firstCharIndex - indentCountReference >= 0 ? firstCharIndex - indentCountReference : 0;
-                string indentedLine = new string(' ', leadingZerosToAdd) + currentLine.Trim();
+                string indentedLine = GetIndentedLine(indentCountReference);
                 switch (fillingState)
                 {
                     case FillingState.BACKGROUND_GIVEN:
@@ -175,6 +200,9 @@ namespace GherkinSimpleParser
 
         private void HandleGivenLine()
         {
+            if (fillingState == FillingState.MARKDOWN_BACKGROUND) fillingState = FillingState.BACKGROUND_GIVEN;
+            if (fillingState == FillingState.MARKDOWN_SCENARIO) fillingState = FillingState.SCENARIO_GIVEN;
+
             if (fillingState == FillingState.SCENARIO_GIVEN)
                 currentScenario.Givens.Add(new Instruction(TrimedLine.Substring(6)));
             else if (fillingState == FillingState.BACKGROUND_GIVEN)
@@ -187,7 +215,8 @@ namespace GherkinSimpleParser
             currentScenario.Tags = new List<string>(lastSeenTags.Distinct());
             lastSeenTags.Clear();
             result.Scenarios.Add(currentScenario);
-            fillingState = FillingState.SCENARIO_GIVEN;
+            markdownIndexIndent = currentLine.Replace("\t", "   ").TakeWhile(c => c == ' ').Count();
+            fillingState = FillingState.MARKDOWN_SCENARIO;
         }
 
         private void HandleBackgroundLine()
@@ -195,7 +224,8 @@ namespace GherkinSimpleParser
             if (backgroundCount > 0)
                 throw new ArgumentException($"Line {lineCount}: Do not support multiple Background in one file", nameof(inputLines));
             backgroundCount++;
-            fillingState = FillingState.BACKGROUND_GIVEN;
+            markdownIndexIndent = currentLine.Replace("\t", "   ").TakeWhile(c => c == ' ').Count();
+            fillingState = FillingState.MARKDOWN_BACKGROUND;
         }
 
         private void HandleFeatureLine()
@@ -206,7 +236,8 @@ namespace GherkinSimpleParser
             result.FeatureTags = new List<string>(lastSeenTags.Distinct());
             lastSeenTags.Clear();
             featureCount++;
-            fillingState = FillingState.OTHER;
+            markdownIndexIndent = currentLine.Replace("\t", "   ").TakeWhile(c => c == ' ').Count();
+            fillingState = FillingState.MARKDOWN_FEATURE;
         }
 
         private void HandleTagLine()
@@ -215,6 +246,14 @@ namespace GherkinSimpleParser
                 throw new ArgumentException($"Line {lineCount}: In a tag line, spaces can only be used to separate tags starting with @.", nameof(inputLines));
             var tagsOnLine = TrimedLine.Replace(" ", "").Split('@', StringSplitOptions.RemoveEmptyEntries).Select(tag => "@" + tag);
             lastSeenTags.AddRange(tagsOnLine);
+            fillingState = FillingState.OTHER;
+        }
+
+        private string GetIndentedLine(int firstCharIndexOnCurrentLineReference)
+        {
+            int firstCharIndex = string.IsNullOrEmpty(currentLine) ? 0 : currentLine.IndexOf(currentLine.Trim().First());
+            int leadingZerosToAdd = firstCharIndex - firstCharIndexOnCurrentLineReference >= 0 ? firstCharIndex - firstCharIndexOnCurrentLineReference : 0;
+            return new string(' ', leadingZerosToAdd) + currentLine.Trim();
         }
     }
 }
