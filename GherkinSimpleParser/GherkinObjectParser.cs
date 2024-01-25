@@ -123,7 +123,7 @@ namespace GherkinSimpleParser
                         currentScenario.Thens.Last().DataTable.Add(tableRow);
                         break;
                     default:
-                        break;
+                        throw new StateMachineException($"Line {lineCount}: Pipe (|) cannot be handeled in {fillingState} state.");
                 }
 
                 if (linesStack.Count == 0)
@@ -158,7 +158,7 @@ namespace GherkinSimpleParser
                         currentScenario.Thens.Last().DocStrings.Add(indentedLine);
                         break;
                     default:
-                        throw new StateMachineException($"State {fillingState} is not allowed to contain DocString");
+                        throw new StateMachineException($"Line {lineCount}: Docstring (\"\"\") cannot be handeled in {fillingState} state.");
                 }
                 currentLine = linesStack.Pop();
                 lineCount++;
@@ -182,7 +182,7 @@ namespace GherkinSimpleParser
                     currentScenario.Thens.Add(new Instruction(TrimedLine.Substring(4)));
                     break;
                 default:
-                    break;
+                    throw new StateMachineException($"Line {lineCount}: \"And\" cannot be handeled in {fillingState} state.");
             }
         }
 
