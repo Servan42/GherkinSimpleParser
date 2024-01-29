@@ -27,5 +27,21 @@ namespace GherkinSimpleParser
 
             return result;
         }
+
+        public void TransformScenarioOutlineToClassicScenarioAndOverrideScenarioList()
+        {
+            var newScenarioList = new List<Scenario>();
+
+            foreach (var scenario in Scenarios)
+            {
+                if(!scenario.IsScenarioOutline)
+                { 
+                    newScenarioList.Add(scenario);
+                    continue;
+                }
+                newScenarioList.AddRange(scenario.GetScenariosFromOutline());
+            }
+            this.Scenarios = newScenarioList;
+        }
     }
 }
