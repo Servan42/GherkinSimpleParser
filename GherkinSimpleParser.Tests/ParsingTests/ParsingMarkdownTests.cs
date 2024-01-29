@@ -39,6 +39,20 @@ namespace GherkinSimpleParser.Tests.ParsingTests
                 "       Given a",
                 "       When b",
                 "       Then c",
+                "",
+                "   Scenario Outline: Scenario 3",
+                "   markdown8",
+                "   markdown9",
+                "       Given a",
+                "       When b",
+                "       Then c",
+                "# not markdown",
+                "   Examples:",
+                "   markdown10",
+                "   markdown11",
+                "       | header |",
+                "       | value |",
+
             };
         }
 
@@ -97,6 +111,34 @@ namespace GherkinSimpleParser.Tests.ParsingTests
                 "markdown6",
                 "        double indented markdown7",
             }, result.Scenarios[1].MarkdownLines);
+        }
+
+        [Test]
+        public void Should_parse_markdown_after_scenario_outline()
+        {
+            // When
+            var result = new GherkinObjectParser(completeInputLines).Parse();
+
+            // Then
+            CollectionAssert.AreEqual(new List<string>
+            {
+                "markdown8",
+                "markdown9",
+            }, result.Scenarios[2].MarkdownLines);
+        }
+
+        [Test]
+        public void Should_parse_markdown_after_scenario_outline_examples()
+        {
+            // When
+            var result = new GherkinObjectParser(completeInputLines).Parse();
+
+            // Then
+            CollectionAssert.AreEqual(new List<string>
+            {
+                "markdown10",
+                "markdown11",
+            }, result.Scenarios[2].MarkdownLinesExamples);
         }
     }
 }

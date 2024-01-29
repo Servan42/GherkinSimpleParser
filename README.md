@@ -8,7 +8,11 @@ Library that loads [Gherkin syntax](https://cucumber.io/docs/gherkin/reference/)
 
 ```csharp
 var inputLines = new List<string>();
-var gherkinObj = new GherkinObjectParser(lines).Parse();
+var gherkinObj = new GherkinObjectParser(inputLines).Parse();
+
+// Replaces scenario outlines with one scenario per case in the "Examples"
+// "Examples" markdown block is lost in the process
+gherkinObj.TransformScenarioOutlineToClassicScenarioAndOverrideScenarioList();
 ```
 
 ## Supports
@@ -24,7 +28,9 @@ var gherkinObj = new GherkinObjectParser(lines).Parse();
 * `"""` (Doc Strings) (for Given, When, Then, And)
 * `|` (Data Tables) (for Given, When, Then, And)
 * `@` (Tags) (Before Scenario and Feature)
-* Markdown after `Feature`, `Background` and `Scenario`
+* `Scenario Outline`
+* `Examples`
+* Markdown after `Feature`, `Background`, `Scenario`, `Scenario Outline` and `Examples`
 
 ## Ignores
 * Empty lines (except in Markdown blocks)
@@ -34,16 +40,19 @@ var gherkinObj = new GherkinObjectParser(lines).Parse();
 * Guard clause for wrongly structured files and unexpected lines
 * Multiple `Feature` per file
 * `Rule`
-* `Example`
+* `Example` (alias)
 * `But`
-* `*`
-* `Scenario Outline` (or `Scenario Template`)
-* `Examples` (or `Scenarios`)
+* `*` (alias)
+* `Scenario Template` (alias)
+* `Scenarios` (alias)
 
 # Exports
 
-## DO NOT exports
+## To be noted
 
+The converter does not transform scenario outlines to classic scenarios before exporting.
+
+The converter does not exports
 * Tags
 * Markdown blocks
 
@@ -102,6 +111,7 @@ into
 ";Prerequisite_2.1|Prere"q"uisite_2.2;Action_2;Result_2.1|Resu"l"t_2.2"
 ```
 
-# More information
+---
 
+**More information and sources:**\
 https://github.com/Servan42/GherkinSimpleParser
