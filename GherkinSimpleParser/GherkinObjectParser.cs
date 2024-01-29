@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace GherkinSimpleParser
 {
@@ -49,7 +50,7 @@ namespace GherkinSimpleParser
             SCENARIO_THEN,
         }
 
-        private class StateMachineException : Exception
+        public class StateMachineException : Exception
         {
             public StateMachineException(string? message) : base(message)
             {
@@ -71,17 +72,78 @@ namespace GherkinSimpleParser
                 else if (TrimedLine.StartsWith("@")) HandleTagLine();
                 else if (TrimedLine.StartsWith("Feature: ")) HandleFeatureLine();
                 else if (TrimedLine.StartsWith("Background:")) HandleBackgroundLine();
-                else if (TrimedLine.StartsWith("Scenario: ")) HandleScenarioLine();
+                else if (TrimedLine.StartsWith("Scenario: ") || TrimedLine.StartsWith("Scenario Outline: ")) HandleScenarioLine();
                 else if (TrimedLine.StartsWith("Given ")) HandleGivenLine();
                 else if (TrimedLine.StartsWith("When ")) HandleWhenLine();
                 else if (TrimedLine.StartsWith("Then ")) HandleThenLine();
                 else if (TrimedLine.StartsWith("And ")) HandleAndLine();
+                else if (TrimedLine.StartsWith("Examples:")) HandleExamplesBlock();
                 else if (TrimedLine.StartsWith("\"\"\"")) HandleDocStringsBlock();
                 else if (TrimedLine.StartsWith("|")) HandleDataTableBlock();
                 else HandleMarkdownOrThrow();
             }
 
+            AssertEveryScenarioOutlineHasExamples(result);
+
             return result;
+        }
+
+        private void AssertEveryScenarioOutlineHasExamples(GherkinObject result)
+        {
+            foreach(var scenario in result.Scenarios)
+            {
+                if (!scenario.IsScenarioOutline)
+                    continue;
+
+                if (scenario.Examples.Count == 0)
+                    throw new ArgumentException("At least one Scenario Outline does not have Examples.", nameof(inputLines));
+
+                foreach (var example in scenario.Examples.Values)
+                {
+                    if(example == null || example.Count == 0)
+                        throw new ArgumentException("At least one Scenario Outline does not have Examples data.", nameof(inputLines));
+                }
+            }
+        }
+
+        private void HandleExamplesBlock()
+        {
+            if (currentScenario == null || currentScenario.IsScenarioOutline == false)
+                throw new StateMachineException($"Line {lineCount}: Cannot have an Examples block for a Scenario that is not an outline.");
+
+            currentLine = linesStack.Pop();
+            lineCount++;
+
+            while (TrimedLine.StartsWith("|"))
+            {
+                var tableRow = TrimedLine.Split("|", StringSplitOptions.TrimEntries).Skip(1).SkipLast(1).ToList();
+                
+                if (currentScenario.Examples.Count == 0) 
+                {
+                    // Init headers
+                    if (tableRow.Distinct().Count() != tableRow.Count)
+                        throw new ArgumentException($"Line {lineCount}: An Example cannot have duplicate headers", nameof(inputLines));
+                    tableRow.ForEach(c => currentScenario.Examples.Add(c, new List<string>()));
+                }
+                else
+                {
+                    int i = 0;
+                    foreach (var column in currentScenario.Examples.Values)
+                    {
+                        column.Add(tableRow[i]);
+                        i++;
+                    }
+                }
+
+                if (linesStack.Count == 0)
+                    return;
+
+                currentLine = linesStack.Pop();
+                lineCount++;
+            }
+
+            linesStack.Push(currentLine);
+            lineCount--;
         }
 
         private void HandleMarkdownOrThrow()
@@ -133,6 +195,7 @@ namespace GherkinSimpleParser
                 lineCount++;
             }
             linesStack.Push(currentLine);
+            lineCount--;
         }
 
         private void HandleDocStringsBlock()
@@ -211,7 +274,19 @@ namespace GherkinSimpleParser
 
         private void HandleScenarioLine()
         {
-            currentScenario = new Scenario { Name = TrimedLine.Substring(10) };
+            currentScenario = new Scenario();
+
+            if (TrimedLine.StartsWith("Scenario Outline: "))
+            {
+                currentScenario.Name = TrimedLine.Substring(18);
+                currentScenario.IsScenarioOutline = true;
+            }
+            else
+            {
+                currentScenario.Name = TrimedLine.Substring(10);
+                currentScenario.IsScenarioOutline = false;
+            }
+
             currentScenario.Tags = new List<string>(lastSeenTags.Distinct());
             lastSeenTags.Clear();
             result.Scenarios.Add(currentScenario);
