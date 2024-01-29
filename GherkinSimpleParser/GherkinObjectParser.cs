@@ -44,10 +44,12 @@ namespace GherkinSimpleParser
             MARKDOWN_FEATURE,
             MARKDOWN_BACKGROUND,
             MARKDOWN_SCENARIO,
+            MARKDOWN_SCENARIO_OUTLINE_EXAMPLE,
             BACKGROUND_GIVEN,
             SCENARIO_GIVEN,
             SCENARIO_WHEN,
             SCENARIO_THEN,
+            SCENARIO_OUTLINE_EXAMPLE,
         }
 
         public class StateMachineException : Exception
@@ -68,7 +70,8 @@ namespace GherkinSimpleParser
                 else if (string.IsNullOrEmpty(TrimedLine)
                     && fillingState != FillingState.MARKDOWN_FEATURE
                     && fillingState != FillingState.MARKDOWN_BACKGROUND
-                    && fillingState != FillingState.MARKDOWN_SCENARIO) continue;
+                    && fillingState != FillingState.MARKDOWN_SCENARIO
+                    && fillingState != FillingState.MARKDOWN_SCENARIO_OUTLINE_EXAMPLE) continue;
                 else if (TrimedLine.StartsWith("@")) HandleTagLine();
                 else if (TrimedLine.StartsWith("Feature: ")) HandleFeatureLine();
                 else if (TrimedLine.StartsWith("Background:")) HandleBackgroundLine();
@@ -90,7 +93,7 @@ namespace GherkinSimpleParser
 
         private void AssertEveryScenarioOutlineHasExamples(GherkinObject result)
         {
-            foreach(var scenario in result.Scenarios)
+            foreach (var scenario in result.Scenarios)
             {
                 if (!scenario.IsScenarioOutline)
                     continue;
@@ -100,7 +103,7 @@ namespace GherkinSimpleParser
 
                 foreach (var example in scenario.Examples.Values)
                 {
-                    if(example == null || example.Count == 0)
+                    if (example == null || example.Count == 0)
                         throw new ArgumentException("At least one Scenario Outline does not have Examples data.", nameof(inputLines));
                 }
             }
@@ -111,39 +114,7 @@ namespace GherkinSimpleParser
             if (currentScenario == null || currentScenario.IsScenarioOutline == false)
                 throw new StateMachineException($"Line {lineCount}: Cannot have an Examples block for a Scenario that is not an outline.");
 
-            currentLine = linesStack.Pop();
-            lineCount++;
-
-            while (TrimedLine.StartsWith("|"))
-            {
-                var tableRow = TrimedLine.Split("|", StringSplitOptions.TrimEntries).Skip(1).SkipLast(1).ToList();
-                
-                if (currentScenario.Examples.Count == 0) 
-                {
-                    // Init headers
-                    if (tableRow.Distinct().Count() != tableRow.Count)
-                        throw new ArgumentException($"Line {lineCount}: An Example cannot have duplicate headers", nameof(inputLines));
-                    tableRow.ForEach(c => currentScenario.Examples.Add(c, new List<string>()));
-                }
-                else
-                {
-                    int i = 0;
-                    foreach (var column in currentScenario.Examples.Values)
-                    {
-                        column.Add(tableRow[i]);
-                        i++;
-                    }
-                }
-
-                if (linesStack.Count == 0)
-                    return;
-
-                currentLine = linesStack.Pop();
-                lineCount++;
-            }
-
-            linesStack.Push(currentLine);
-            lineCount--;
+            fillingState = FillingState.MARKDOWN_SCENARIO_OUTLINE_EXAMPLE;
         }
 
         private void HandleMarkdownOrThrow()
@@ -160,6 +131,9 @@ namespace GherkinSimpleParser
                 case FillingState.MARKDOWN_SCENARIO:
                     currentScenario.MarkdownLines.Add(indentedLine);
                     break;
+                case FillingState.MARKDOWN_SCENARIO_OUTLINE_EXAMPLE:
+                    currentScenario.MarkdownLinesExamples.Add(indentedLine);
+                    break;
                 default:
                     throw new ArgumentException($"Line {lineCount}: Unsupported line: \"{TrimedLine}\"", nameof(inputLines));
             }
@@ -167,6 +141,8 @@ namespace GherkinSimpleParser
 
         private void HandleDataTableBlock()
         {
+            if (fillingState == FillingState.MARKDOWN_SCENARIO_OUTLINE_EXAMPLE) fillingState = FillingState.SCENARIO_OUTLINE_EXAMPLE;
+
             while (TrimedLine.StartsWith("|"))
             {
                 var tableRow = TrimedLine.Split("|", StringSplitOptions.TrimEntries).Skip(1).SkipLast(1).ToList();
@@ -184,6 +160,9 @@ namespace GherkinSimpleParser
                     case FillingState.SCENARIO_THEN:
                         currentScenario.Thens.Last().DataTable.Add(tableRow);
                         break;
+                    case FillingState.SCENARIO_OUTLINE_EXAMPLE:
+                        AddTableRowToExamplesBlock(tableRow);
+                        break;
                     default:
                         throw new StateMachineException($"Line {lineCount}: Pipe (|) cannot be handeled in {fillingState} state.");
                 }
@@ -196,6 +175,26 @@ namespace GherkinSimpleParser
             }
             linesStack.Push(currentLine);
             lineCount--;
+        }
+
+        private void AddTableRowToExamplesBlock(List<string> tableRow)
+        {
+            if (currentScenario.Examples.Count == 0)
+            {
+                // Init headers
+                if (tableRow.Distinct().Count() != tableRow.Count)
+                    throw new ArgumentException($"Line {lineCount}: An Example cannot have duplicate headers", nameof(inputLines));
+                tableRow.ForEach(c => currentScenario.Examples.Add(c, new List<string>()));
+            }
+            else
+            {
+                int i = 0;
+                foreach (var column in currentScenario.Examples.Values)
+                {
+                    column.Add(tableRow[i]);
+                    i++;
+                }
+            }
         }
 
         private void HandleDocStringsBlock()

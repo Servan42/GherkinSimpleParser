@@ -6,6 +6,7 @@ namespace GherkinSimpleParser
     {
         public string Name { get; set; }
         public List<string> MarkdownLines { get; set; } = new();
+        public List<string> MarkdownLinesExamples { get; set; } = new();
         public List<Instruction> Givens { get; set; } = new();
         public List<Instruction> Whens { get; set; } = new();
         public List<Instruction> Thens { get; set; } = new();
