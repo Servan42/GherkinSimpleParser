@@ -14,6 +14,7 @@ try
 		Console.WriteLine(filepath);
 		var lines = File.ReadAllLines(filepath).ToList();
 		var obj = new GherkinObjectParser(lines).Parse();
+		obj.TransformScenarioOutlineToClassicScenarioAndOverrideScenarioList();
 		//File.WriteAllLines(@$"{outputDirPath}/{Path.GetFileName(filepath)}.csv", obj.ExportAsCSVWithExcelFormulaWrap_FR());
 		gherkinObjs.Add(obj);
 	}
