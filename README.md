@@ -8,7 +8,11 @@ Library that loads [Gherkin syntax](https://cucumber.io/docs/gherkin/reference/)
 
 ```csharp
 var inputLines = new List<string>();
-var gherkinObj = GherkinObject.Parse(inputLines));
+var gherkinObj = new GherkinObjectParser(inputLines).Parse();
+
+// Replaces scenario outlines with one scenario per case in the "Examples"
+// "Examples" markdown block is lost in the process
+gherkinObj.TransformScenarioOutlineToClassicScenarioAndOverrideScenarioList();
 ```
 
 ## Supports
@@ -17,28 +21,40 @@ var gherkinObj = GherkinObject.Parse(inputLines));
 * `Scenario` (multiple)
 * `Given`
 * `And` (given, multiple)
-* `When` (unique)
+* `When`
+* `And` (when, multiple)
 * `Then`
 * `And` (then, multiple)
-* `"""` (Doc Strings) (for Given, Then)
+* `"""` (Doc Strings) (for Given, When, Then, And)
+* `|` (Data Tables) (for Given, When, Then, And)
+* `@` (Tags) (Before Scenario and Feature)
+* `Scenario Outline`
+* `Examples`
+* Markdown after `Feature`, `Background`, `Scenario`, `Scenario Outline` and `Examples`
 
 ## Ignores
-* Empty lines
+* Empty lines (except in Markdown blocks)
 * `#` (Comments)
 
-## DO NOT support (will throw exception)
+## DOES NOT support (will throw exception)
 * Guard clause for wrongly structured files and unexpected lines
 * Multiple `Feature` per file
 * `Rule`
-* `Example`
+* `Example` (alias)
 * `But`
-* `*`
-* `Scenario Outline` (or `Scenario Template`)
-* `Examples` (or `Scenarios`)
-* `|` (Data Tables)
-* `@` (Tags)
+* `*` (alias)
+* `Scenario Template` (alias)
+* `Scenarios` (alias)
 
 # Exports
+
+## To be noted
+
+The converter does not transform scenario outlines to classic scenarios before exporting.
+
+The converter does not exports
+* Tags
+* Markdown blocks
 
 ## Export as Excel using EPPlus Excel library
 
@@ -48,7 +64,7 @@ Using the applicaiton extension `GherkinSimpleParser.Converter` you have access 
 
 ### To be noted
 
-New lines and carriage return are removed from Doc strings (`"""`).
+New lines and carriage return are removed from Doc strings (`"""`) and from Data Tables (`|`).
 
 ### Export as CSV for testplan with \<speparator> for ANDs
 
@@ -61,7 +77,7 @@ List<string> CSVLines = gherkinObj.ExportAsCSV(separator));
 ```
 
 Transforms
-```
+```gherkin
 Feature: feature name
 # As user
 # I want to do test cases
@@ -95,24 +111,7 @@ into
 ";Prerequisite_2.1|Prere"q"uisite_2.2;Action_2;Result_2.1|Resu"l"t_2.2"
 ```
 
-### Export as CSV for testplan in Excel with formula wrap
+---
 
-**LIMITATION: GIVENs and THENs text can only be 255 character longs because excel is annoying. Hence, DocStrings are not exported in this mode**
-
-```csharp
-GherkinObject gherkinObj = GherkinObject.Parse(inputLines));
-string separator = "|";
-List<string> CSVLines = gherkinObj.ExportAsCSVWithExcelFormulaWrap_EN(separator));
-```
-Use `ExportAsCSVWithExcelFormulaWrap_FR` to have `CAR(10)` instead of `CHAR(10)` if you're french because Excel is annoying.
-
-Transforms the above .feature file\
-into
-```
-"Number;GIVEN;WHEN;THEN",
-";="GENERAL PREREQUISITES:" & CHAR(10) & "Prerequisite_0.1" & CHAR(10) & "Prere""q""uisite_0.2";;",
-"1;Test Case 1;;",
-";="Prerequisite_1.1" & CHAR(10) & "Prere""q""uisite_1.2";Action_1;="Result_1.1" & CHAR(10) & "Resu""l""t_1.2"",
-"2;Test Case 2;;",
-";="Prerequisite_2.1" & CHAR(10) & "Prere""q""uisite_2.2";Action_2;="Result_2.1" & CHAR(10) & "Resu""l""t_2.2""            
-```
+**More information and sources:**\
+https://github.com/Servan42/GherkinSimpleParser

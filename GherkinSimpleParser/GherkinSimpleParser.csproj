@@ -5,13 +5,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <VersionPrefix>1.2.0</VersionPrefix>
+    <Version>1.3.0</Version>
     <Title>Gherkin Simple Parser to object</Title>
     <Authors>Servan CHARLOT</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Servan42/GherkinSimpleParser</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Description>Gherkin Simple Parser to object</Description>
   </PropertyGroup>
 
   <ItemGroup>
