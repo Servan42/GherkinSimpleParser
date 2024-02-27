@@ -2,6 +2,9 @@
 
 namespace GherkinSimpleParser
 {
+    /// <summary>
+    /// Represents a Datatable, usually written after an Instruction line.
+    /// </summary>
     public class GherkinDataTable : List<List<string>>
     {
         internal GherkinDataTable DeepClone()

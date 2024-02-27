@@ -1,0 +1,121 @@
+name: CI-CD
+
+on: 
+  push:
+    branches:
+      - master
+      - develop
+  pull_request: 
+    branches:
+      - master
+      - develop
+
+jobs:
+
+  Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+    
+    - name: Build
+      run: dotnet build -c Debug
+    - name: Test
+      run: dotnet test --no-build -c Debug
+
+  Package_Version:
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare environment
+        run: |
+          echo "PARSER_VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" ./GherkinSimpleParser/GherkinSimpleParser.csproj)" >> $GITHUB_ENV
+          echo "CONVERTER_VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" ./GherkinSimpleParser.Converter/GherkinSimpleParser.Converter.csproj)" >> $GITHUB_ENV
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Publish Parser
+        run: |
+          dotnet publish ./GherkinSimpleParser --no-build -c Release -o ./PublishFolder/temp
+          cp ./LICENSE.txt ./PublishFolder/temp
+          cp ./README.md ./PublishFolder/temp
+          zip -r ./PublishFolder/GherkinSimpleParser_dll_$PARSER_VERSION.zip ./PublishFolder/temp/*
+          rm -rf ./PublishFolder/temp
+          cp ./GherkinSimpleParser/bin/Release/GherkinSimpleParser.$PARSER_VERSION.nupkg ./PublishFolder
+
+      - name: Publish Converter
+        run: |
+          dotnet publish ./GherkinSimpleParser.Converter --no-build -c Release -o ./PublishFolder/temp
+          cp ./LICENSE.txt ./PublishFolder/temp
+          cp ./README.md ./PublishFolder/temp
+          zip -r ./PublishFolder/GherkinSimpleParser.Converter_dll_$CONVERTER_VERSION.zip ./PublishFolder/temp/*
+          rm -rf ./PublishFolder/temp
+          cp ./GherkinSimpleParser.Converter/bin/Release/GherkinSimpleParser.Converter.$CONVERTER_VERSION.nupkg ./PublishFolder
+
+      - name: Publish Console
+        run: |
+          dotnet publish ./GherkinSimpleParser.Console --no-build -c Release -o ./PublishFolder/temp
+          cp ./LICENSE.txt ./PublishFolder/temp
+          cp ./README.md ./PublishFolder/temp
+          zip -r ./PublishFolder/GherkinSimpleParser.Console_dll_$PARSER_VERSION.zip ./PublishFolder/temp/*
+          rm -rf ./PublishFolder/temp
+      
+      - name: Generate Release File
+        run: |
+          cd ./PublishFolder
+          echo -e "## Release Notes \n\n- TODO\n\n## SHA256\n\n### Parser\n" >> release_notes.md
+          echo "- \`$(shasum -a 256 GherkinSimpleParser.$PARSER_VERSION.nupkg)\`" >> release_notes.md
+          echo "- \`$(shasum -a 256 GherkinSimpleParser_dll_$PARSER_VERSION.zip)\`" >> release_notes.md
+          echo -e "\n### Converter\n" >> release_notes.md
+          echo "- \`$(shasum -a 256 GherkinSimpleParser.Converter.$CONVERTER_VERSION.nupkg)\`" >> release_notes.md
+          echo "- \`$(shasum -a 256 GherkinSimpleParser.Converter_dll_$CONVERTER_VERSION.zip)\`" >> release_notes.md
+          echo -e "\n### Console\n" >> release_notes.md
+          echo "- \`$(shasum -a 256 GherkinSimpleParser.Console_dll_$PARSER_VERSION.zip)\`" >> release_notes.md
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: PublishFolder
+          path: ./PublishFolder
+    
+  Publish_Nuget_Package:
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      needs: Tests
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Build
+        run: dotnet build ./GherkinSimpleParser -c Release
+
+      - name: Nuget Push
+        run: |
+          PARSER_VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" ./GherkinSimpleParser/GherkinSimpleParser.csproj)
+          dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.NUGET_PAT }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          dotnet nuget push ./GherkinSimpleParser/bin/Release/GherkinSimpleParser.$PARSER_VERSION.nupkg --source "github"
+
+
+      
+
+
+
+  

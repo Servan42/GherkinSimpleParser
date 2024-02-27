@@ -1,0 +1,32 @@
+name: master_Integration
+
+on: 
+  pull_request: 
+    branches:
+      - master
+
+jobs:
+
+  Merge_master_Integration_Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+    
+    - name: Config local repo
+      run: | 
+        git config --global user.email "gitHubAction@github.com"
+        git config --global user.name "GithubAction"
+    - name: Merge master locally
+      run: git merge origin/master
+    - name: Build
+      run: dotnet build -c Debug
+    - name: Test
+      run: dotnet test -c Debug
