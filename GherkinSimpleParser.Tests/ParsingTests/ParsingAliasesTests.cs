@@ -61,5 +61,43 @@ namespace GherkinSimpleParser.Tests.ParsingTests
                 Assert.That(result.Scenarios.First().Thens.Last().MainLine, Is.EqualTo("result2"));
             });
         }
+
+        [Test]
+        public void Should_parse_ScenarioOutline_aliases()
+        {
+            // Given
+            var inputLines = new List<string>
+            {
+                "Scenario Template: eating",
+                "Given there are<start> cucumbers",
+                "When I eat <eat> cucumbers",
+                "Then I should have <left> cucumbers",
+                "",
+                "Scenarios:",
+                "   | start | eat | left |",
+                "   | 12 | 5 | 7 |",
+                "   | 20 | 5 | 15 |",
+            };
+
+            // When
+            var result = new GherkinObjectParser(inputLines).Parse();
+
+            // Then
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Scenarios[0].Name, Is.EqualTo("eating"));
+                Assert.That(result.Scenarios[0].Givens[0].MainLine, Is.EqualTo("there are<start> cucumbers"));
+                Assert.That(result.Scenarios[0].Whens[0].MainLine, Is.EqualTo("I eat <eat> cucumbers"));
+                Assert.That(result.Scenarios[0].Thens[0].MainLine, Is.EqualTo("I should have <left> cucumbers"));
+                Assert.That(result.Scenarios[0].IsScenarioOutline, Is.EqualTo(true));
+                CollectionAssert.AreEqual(new Dictionary<string, List<string>>
+                {
+                    { "start", new List<string> { "12", "20" } },
+                    { "eat", new List<string> { "5", "5" } },
+                    { "left", new List<string> { "7", "15" } },
+                },
+                result.Scenarios[0].Examples);
+            });
+        }
     }
 }

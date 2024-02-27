@@ -83,7 +83,7 @@ namespace GherkinSimpleParser
                 else if (TrimedLine.StartsWith("When ")) HandleWhenLine();
                 else if (TrimedLine.StartsWith("Then ")) HandleThenLine();
                 else if (IsAndLine()) HandleAndLine();
-                else if (TrimedLine.StartsWith("Examples:")) HandleExamplesBlock();
+                else if (IsExampleBlockLine()) HandleExamplesBlock();
                 else if (TrimedLine.StartsWith("\"\"\"")) HandleDocStringsBlock();
                 else if (TrimedLine.StartsWith("|")) HandleDataTableBlock();
                 else HandleMarkdownOrThrow();
@@ -96,14 +96,26 @@ namespace GherkinSimpleParser
 
         private bool IsAScenarioLine()
         {
-            return TrimedLine.StartsWith("Scenario: ") 
+            return TrimedLine.StartsWith("Scenario: ")
                 || TrimedLine.StartsWith("Example: ")
-                || TrimedLine.StartsWith("Scenario Outline: ");
+                || IsAScenarioOutlineLine();
+        }
+
+        private bool IsAScenarioOutlineLine()
+        {
+            return TrimedLine.StartsWith("Scenario Outline: ")
+                || TrimedLine.StartsWith("Scenario Template: ");
         }
 
         private bool IsAndLine()
         {
             return TrimedLine.StartsWith("And ") || TrimedLine.StartsWith("* ");
+        }
+
+        private bool IsExampleBlockLine()
+        {
+            return TrimedLine.StartsWith("Examples:")
+                || TrimedLine.StartsWith("Scenarios:");
         }
 
         private void AssertEveryScenarioOutlineHasExamples(GherkinObject result)
@@ -292,7 +304,7 @@ namespace GherkinSimpleParser
             currentScenario = new Scenario
             {
                 Name = TrimedLine.Substring(TrimedLine.IndexOf(':') + 2),
-                IsScenarioOutline = TrimedLine.StartsWith("Scenario Outline: "),
+                IsScenarioOutline = IsAScenarioOutlineLine(),
                 Tags = new List<string>(lastSeenTags.Distinct())
             };
 
