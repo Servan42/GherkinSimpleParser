@@ -78,12 +78,12 @@ namespace GherkinSimpleParser
                 else if (TrimedLine.StartsWith("@")) HandleTagLine();
                 else if (TrimedLine.StartsWith("Feature: ")) HandleFeatureLine();
                 else if (TrimedLine.StartsWith("Background:")) HandleBackgroundLine();
-                else if (TrimedLine.StartsWith("Scenario: ") || TrimedLine.StartsWith("Scenario Outline: ")) HandleScenarioLine();
+                else if (IsAScenarioLine()) HandleScenarioLine();
                 else if (TrimedLine.StartsWith("Given ")) HandleGivenLine();
                 else if (TrimedLine.StartsWith("When ")) HandleWhenLine();
                 else if (TrimedLine.StartsWith("Then ")) HandleThenLine();
-                else if (TrimedLine.StartsWith("And ")) HandleAndLine();
-                else if (TrimedLine.StartsWith("Examples:")) HandleExamplesBlock();
+                else if (IsAndLine()) HandleAndLine();
+                else if (IsExampleBlockLine()) HandleExamplesBlock();
                 else if (TrimedLine.StartsWith("\"\"\"")) HandleDocStringsBlock();
                 else if (TrimedLine.StartsWith("|")) HandleDataTableBlock();
                 else HandleMarkdownOrThrow();
@@ -92,6 +92,30 @@ namespace GherkinSimpleParser
             AssertEveryScenarioOutlineHasExamples(result);
 
             return result;
+        }
+
+        private bool IsAScenarioLine()
+        {
+            return TrimedLine.StartsWith("Scenario: ")
+                || TrimedLine.StartsWith("Example: ")
+                || IsAScenarioOutlineLine();
+        }
+
+        private bool IsAScenarioOutlineLine()
+        {
+            return TrimedLine.StartsWith("Scenario Outline: ")
+                || TrimedLine.StartsWith("Scenario Template: ");
+        }
+
+        private bool IsAndLine()
+        {
+            return TrimedLine.StartsWith("And ") || TrimedLine.StartsWith("* ");
+        }
+
+        private bool IsExampleBlockLine()
+        {
+            return TrimedLine.StartsWith("Examples:")
+                || TrimedLine.StartsWith("Scenarios:");
         }
 
         private void AssertEveryScenarioOutlineHasExamples(GherkinObject result)
@@ -232,19 +256,20 @@ namespace GherkinSimpleParser
 
         private void HandleAndLine()
         {
+            string instructionText = TrimedLine.Substring(TrimedLine.IndexOf(' ') + 1);
             switch (fillingState)
             {
                 case FillingState.BACKGROUND_GIVEN:
-                    result.Background.Givens.Add(new Instruction(TrimedLine.Substring(4)));
+                    result.Background.Givens.Add(new Instruction(instructionText));
                     break;
                 case FillingState.SCENARIO_GIVEN:
-                    currentScenario.Givens.Add(new Instruction(TrimedLine.Substring(4)));
+                    currentScenario.Givens.Add(new Instruction(instructionText));
                     break;
                 case FillingState.SCENARIO_WHEN:
-                    currentScenario.Whens.Add(new Instruction(TrimedLine.Substring(4)));
+                    currentScenario.Whens.Add(new Instruction(instructionText));
                     break;
                 case FillingState.SCENARIO_THEN:
-                    currentScenario.Thens.Add(new Instruction(TrimedLine.Substring(4)));
+                    currentScenario.Thens.Add(new Instruction(instructionText));
                     break;
                 default:
                     throw new StateMachineException($"Line {lineCount}: \"And\" cannot be handeled in {fillingState} state.");
@@ -276,20 +301,13 @@ namespace GherkinSimpleParser
 
         private void HandleScenarioLine()
         {
-            currentScenario = new Scenario();
-
-            if (TrimedLine.StartsWith("Scenario Outline: "))
+            currentScenario = new Scenario
             {
-                currentScenario.Name = TrimedLine.Substring(18);
-                currentScenario.IsScenarioOutline = true;
-            }
-            else
-            {
-                currentScenario.Name = TrimedLine.Substring(10);
-                currentScenario.IsScenarioOutline = false;
-            }
+                Name = TrimedLine.Substring(TrimedLine.IndexOf(':') + 2),
+                IsScenarioOutline = IsAScenarioOutlineLine(),
+                Tags = new List<string>(lastSeenTags.Distinct())
+            };
 
-            currentScenario.Tags = new List<string>(lastSeenTags.Distinct());
             lastSeenTags.Clear();
             result.Scenarios.Add(currentScenario);
             markdownIndexIndent = currentLine.Replace("\t", "   ").TakeWhile(c => c == ' ').Count();

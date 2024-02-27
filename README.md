@@ -18,18 +18,19 @@ gherkinObj.TransformScenarioOutlineToClassicScenarioAndOverrideScenarioList();
 ## Supports
 * One `Feature` per file
 * One `Background` per file
-* `Scenario` (multiple)
+* `Scenario` (multiple) (+ alias `Example`)
 * `Given`
 * `And` (given, multiple)
 * `When`
 * `And` (when, multiple)
 * `Then`
 * `And` (then, multiple)
+* `*` Alias for `And`
 * `"""` (Doc Strings) (for Given, When, Then, And)
 * `|` (Data Tables) (for Given, When, Then, And)
 * `@` (Tags) (Before Scenario and Feature)
-* `Scenario Outline`
-* `Examples`
+* `Scenario Outline` (+ alias `Scenario Template`)
+* `Examples` (+ alias `Scenarios`)
 * Markdown after `Feature`, `Background`, `Scenario`, `Scenario Outline` and `Examples`
 
 ## Ignores
@@ -40,11 +41,7 @@ gherkinObj.TransformScenarioOutlineToClassicScenarioAndOverrideScenarioList();
 * Guard clause for wrongly structured files and unexpected lines
 * Multiple `Feature` per file
 * `Rule`
-* `Example` (alias)
 * `But`
-* `*` (alias)
-* `Scenario Template` (alias)
-* `Scenarios` (alias)
 
 # Exports (extension, github only)
 
