@@ -46,7 +46,7 @@ gherkinObj.TransformScenarioOutlineToClassicScenarioAndOverrideScenarioList();
 * `Scenario Template` (alias)
 * `Scenarios` (alias)
 
-# Exports
+# Exports (extension, github only)
 
 ## To be noted
 
