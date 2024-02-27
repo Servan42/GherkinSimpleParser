@@ -4,6 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GherkinSimpleParser
 {
+    /// <summary>
+    /// Represents an instuction (Given, When, Then, And)
+    /// </summary>
     public class Instruction
     {
         public Instruction(string mainLine)
@@ -11,8 +14,17 @@ namespace GherkinSimpleParser
             MainLine = mainLine;
         }
 
+        /// <summary>
+        /// The text that is right after the Instruction (Given, When...) keyword. Does not include the keyword.
+        /// </summary>
         public string MainLine { get; set; }
+        /// <summary>
+        /// The docstrings that are right after the Instruction line.
+        /// </summary>
         public List<string> DocStrings { get; set; } = new();
+        /// <summary>
+        /// An object representing the DataTable that is right after the Instruction line.
+        /// </summary>
         public GherkinDataTable DataTable { get; set; } = new();
 
         internal Instruction ResolveExampleValueInNewObject(Dictionary<string, List<string>> examples, int caseNumber)

@@ -59,6 +59,9 @@ namespace GherkinSimpleParser
             }
         }
 
+        /// <summary>
+        /// Transformes the inputlines provided in constructor into a GherkinObject.
+        /// </summary>
         public GherkinObject Parse()
         {
             while (linesStack.Count > 0)
