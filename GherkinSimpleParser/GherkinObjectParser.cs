@@ -82,7 +82,7 @@ namespace GherkinSimpleParser
                 else if (TrimedLine.StartsWith("Given ")) HandleGivenLine();
                 else if (TrimedLine.StartsWith("When ")) HandleWhenLine();
                 else if (TrimedLine.StartsWith("Then ")) HandleThenLine();
-                else if (TrimedLine.StartsWith("And ")) HandleAndLine();
+                else if (IsAndLine()) HandleAndLine();
                 else if (TrimedLine.StartsWith("Examples:")) HandleExamplesBlock();
                 else if (TrimedLine.StartsWith("\"\"\"")) HandleDocStringsBlock();
                 else if (TrimedLine.StartsWith("|")) HandleDataTableBlock();
@@ -99,6 +99,11 @@ namespace GherkinSimpleParser
             return TrimedLine.StartsWith("Scenario: ") 
                 || TrimedLine.StartsWith("Example: ")
                 || TrimedLine.StartsWith("Scenario Outline: ");
+        }
+
+        private bool IsAndLine()
+        {
+            return TrimedLine.StartsWith("And ") || TrimedLine.StartsWith("* ");
         }
 
         private void AssertEveryScenarioOutlineHasExamples(GherkinObject result)
@@ -239,19 +244,20 @@ namespace GherkinSimpleParser
 
         private void HandleAndLine()
         {
+            string instructionText = TrimedLine.Substring(TrimedLine.IndexOf(' ') + 1);
             switch (fillingState)
             {
                 case FillingState.BACKGROUND_GIVEN:
-                    result.Background.Givens.Add(new Instruction(TrimedLine.Substring(4)));
+                    result.Background.Givens.Add(new Instruction(instructionText));
                     break;
                 case FillingState.SCENARIO_GIVEN:
-                    currentScenario.Givens.Add(new Instruction(TrimedLine.Substring(4)));
+                    currentScenario.Givens.Add(new Instruction(instructionText));
                     break;
                 case FillingState.SCENARIO_WHEN:
-                    currentScenario.Whens.Add(new Instruction(TrimedLine.Substring(4)));
+                    currentScenario.Whens.Add(new Instruction(instructionText));
                     break;
                 case FillingState.SCENARIO_THEN:
-                    currentScenario.Thens.Add(new Instruction(TrimedLine.Substring(4)));
+                    currentScenario.Thens.Add(new Instruction(instructionText));
                     break;
                 default:
                     throw new StateMachineException($"Line {lineCount}: \"And\" cannot be handeled in {fillingState} state.");
