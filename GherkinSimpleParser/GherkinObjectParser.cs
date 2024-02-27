@@ -289,20 +289,13 @@ namespace GherkinSimpleParser
 
         private void HandleScenarioLine()
         {
-            currentScenario = new Scenario();
-
-            if (TrimedLine.StartsWith("Scenario Outline: "))
+            currentScenario = new Scenario
             {
-                currentScenario.Name = TrimedLine.Substring(18);
-                currentScenario.IsScenarioOutline = true;
-            }
-            else
-            {
-                currentScenario.Name = TrimedLine.Substring(10);
-                currentScenario.IsScenarioOutline = false;
-            }
+                Name = TrimedLine.Substring(TrimedLine.IndexOf(':') + 2),
+                IsScenarioOutline = TrimedLine.StartsWith("Scenario Outline: "),
+                Tags = new List<string>(lastSeenTags.Distinct())
+            };
 
-            currentScenario.Tags = new List<string>(lastSeenTags.Distinct());
             lastSeenTags.Clear();
             result.Scenarios.Add(currentScenario);
             markdownIndexIndent = currentLine.Replace("\t", "   ").TakeWhile(c => c == ' ').Count();
