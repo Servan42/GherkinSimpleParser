@@ -200,6 +200,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
         }
 
         [TestCase("But")]
+        [TestCase("Rule:")]
         public void Should_throw_exception_when_encounters_an_unsupported_line(string startWith)
         {
             // Given
