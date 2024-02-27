@@ -78,7 +78,7 @@ namespace GherkinSimpleParser
                 else if (TrimedLine.StartsWith("@")) HandleTagLine();
                 else if (TrimedLine.StartsWith("Feature: ")) HandleFeatureLine();
                 else if (TrimedLine.StartsWith("Background:")) HandleBackgroundLine();
-                else if (TrimedLine.StartsWith("Scenario: ") || TrimedLine.StartsWith("Scenario Outline: ")) HandleScenarioLine();
+                else if (IsAScenarioLine()) HandleScenarioLine();
                 else if (TrimedLine.StartsWith("Given ")) HandleGivenLine();
                 else if (TrimedLine.StartsWith("When ")) HandleWhenLine();
                 else if (TrimedLine.StartsWith("Then ")) HandleThenLine();
@@ -92,6 +92,13 @@ namespace GherkinSimpleParser
             AssertEveryScenarioOutlineHasExamples(result);
 
             return result;
+        }
+
+        private bool IsAScenarioLine()
+        {
+            return TrimedLine.StartsWith("Scenario: ") 
+                || TrimedLine.StartsWith("Example: ")
+                || TrimedLine.StartsWith("Scenario Outline: ");
         }
 
         private void AssertEveryScenarioOutlineHasExamples(GherkinObject result)

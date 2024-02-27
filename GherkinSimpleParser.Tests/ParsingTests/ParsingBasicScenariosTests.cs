@@ -199,7 +199,6 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             });
         }
 
-        [TestCase("Example:")]
         [TestCase("But")]
         [TestCase("*")]
         [TestCase("Scenario Template:")]
