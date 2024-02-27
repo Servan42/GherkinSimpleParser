@@ -1,4 +1,4 @@
-name: CI
+name: CI-CD
 
 on: 
   push:
@@ -16,10 +16,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.0.x
     
@@ -33,7 +33,7 @@ jobs:
     needs: Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Prepare environment
         run: |
@@ -41,7 +41,7 @@ jobs:
           echo "CONVERTER_VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" ./GherkinSimpleParser.Converter/GherkinSimpleParser.Converter.csproj)" >> $GITHUB_ENV
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
 
@@ -97,10 +97,10 @@ jobs:
       needs: Tests
       runs-on: ubuntu-latest
       steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
 
