@@ -17,7 +17,7 @@ namespace GherkinSimpleParser.Tests.ParsingTests
             {
                 "Feature: myFeature",
                 "markdown1",
-                "",
+                "    ",
                 "markdown after empty line",
                 "   Background:",
                 "   markdown2",

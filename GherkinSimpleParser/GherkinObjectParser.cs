@@ -346,7 +346,7 @@ namespace GherkinSimpleParser
 
         private string GetIndentedLine(int firstCharIndexOnCurrentLineReference)
         {
-            int firstCharIndex = string.IsNullOrEmpty(currentLine) ? 0 : currentLine.IndexOf(currentLine.Trim().First());
+            int firstCharIndex = string.IsNullOrEmpty(currentLine.Trim()) ? 0 : currentLine.IndexOf(currentLine.Trim().First());
             int leadingZerosToAdd = firstCharIndex - firstCharIndexOnCurrentLineReference >= 0 ? firstCharIndex - firstCharIndexOnCurrentLineReference : 0;
             return new string(' ', leadingZerosToAdd) + currentLine.Trim();
         }
