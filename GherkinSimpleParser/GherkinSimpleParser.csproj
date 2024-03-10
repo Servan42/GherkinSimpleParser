@@ -13,6 +13,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Description>Gherkin Simple Parser to object</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageProjectUrl>https://github.com/Servan42/GherkinSimpleParser</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
